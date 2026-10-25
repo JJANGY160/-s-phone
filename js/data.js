@@ -364,11 +364,11 @@ const INSTAGRAM = {
     stories: [{ img: 'images/instagram/story-me.jpg', label: '성찬 스토리 사진', caption: '', ago: '15시간' }] },
   recentSearch: [
     { id: 'heesu.k', name: '김희수', avatar: 'images/instagram/heesu-avatar.jpg' },
-    { id: 'alive.youngwon', name: '영원대 홍보대사 얼라이브', avatar: 'images/instagram/alive-avatar.jpg' }
+    { id: 'alive.youngwon', name: '영원대 홍보대사 얼라이브', avatar: 'images/instagram/alive-avatar.png' }
   ],
   storyBar: [
     { id: 'heesu.k', avatar: 'images/instagram/heesu-avatar.jpg', seen: true },
-    { id: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.jpg', seen: false },
+    { id: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.png', seen: false },
     { id: 'sohee_lee', avatar: 'images/profile/sohee.jpg', seen: false }
   ],
   // 스토리를 누르면 열리는 사진 (희수 스토리는 아래 heesu.stories)
@@ -378,7 +378,7 @@ const INSTAGRAM = {
     ]}
   },
   feed: [
-    { user: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.jpg', img: 'images/instagram/alive-post.jpg', label: '성찬과 은석 투샷 (10화)', likes: '1,027', caption: '여자라면 영원대 💙 #영원대 #얼라이브 #홍보대사', time: '1주 전',
+    { user: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.png', img: 'images/instagram/alive-post.jpg', label: '성찬과 은석 투샷 (10화)', likes: '1,027', caption: '여자라면 영원대 💙 #영원대 #얼라이브 #홍보대사', time: '1주 전',
       comments: [
         { id: 'seow_1', text: '영원대 가려고 방금 자퇴하고 옴' },
         { id: 'imnotgay', text: '내남자들 찾았다' },
@@ -425,15 +425,15 @@ const PETCAM = {
     ]},
     { date: '2026-04-07', items: [
       { cam: 'bedroom', time: '23:31', tag: '사람 감지', img: 'images/petcam/clip-0407-2331.jpg', label: '캠을 요리조리 살피는 은석', blur: true, star: true },
-      { cam: 'living', time: '23:24', tag: '사람 감지', img: 'images/petcam/clip-0407-2324.jpg', label: '거실 캠 앞으로 다가오는 은석' }
+      { cam: 'living', time: '23:24', tag: '사람 감지', img: 'images/petcam/clip-0407-2324.png', label: '거실 캠 앞으로 다가오는 은석' }
     ]},
     { date: '2026-04-04', items: [
       { cam: 'living', time: '22:58', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.jpg', label: '캠을 빤히 쳐다보는 은석' },
       { cam: 'bedroom', time: '21:40', tag: '사람 감지', img: 'images/petcam/clip-0404-2140.jpg', label: '침대 위 뒷모습', blur: true, star: true },
-      { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.jpg', label: '은석 품에 뛰어드는 겨울이' }
+      { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.gif', label: '은석 품에 뛰어드는 겨울이' }
     ]},
     { date: '2026-04-03', items: [
-      { cam: 'living', time: '19:20', tag: '사람 감지', img: 'images/petcam/clip-0403-1920.jpg', label: '첫날, 겨울이를 쓰다듬는 은석' }
+      { cam: 'living', time: '19:20', tag: '사람 감지', img: 'images/petcam/clip-0403-1920.png', label: '첫날, 겨울이를 쓰다듬는 은석' }
     ]}
   ]
 };
@@ -543,7 +543,7 @@ const CHROME = {
 /* ---------------- aiAsk (가상 AI) ---------------- */
 const AIASK = [
   { date: '4월 14일' },
-  { role: 'user', type: 'photo', src: 'images/aiask/professor.jpg', label: '운동생리학 교수님 사진' },
+  { role: 'user', type: 'photo', src: 'images/aiask/professor.png', label: '운동생리학 교수님 사진' },
   { role: 'user', text: '이 교수님 관상 보고 중간고사에 낼 것 같은 문제 골라줘' },
   { role: 'ai', text: '얼굴만 보고 시험 문제를 맞히는 건 제가 할 수 없어요. 😅\n\n대신 확실한 방법이 있어요.\n\n1. 수업 중에 "이건 중요하다"고 두 번 이상 말한 부분\n2. 쪽지시험에서 틀린 사람이 많았던 단원\n3. 강의자료에 굵게 표시된 개념\n\n강의자료를 보내 주시면 예상 문제를 같이 정리해 드릴게요.' },
   { role: 'user', text: '아니 관상으로' },
