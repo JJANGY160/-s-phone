@@ -708,3 +708,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .et-boards .eb.eb-off { cursor: default; }
 .et-boards .eb.eb-off:active { background: none; }
+
+/* ---------- 수정 사항 (3차) ---------- */
+.et-card .b { cursor: default; }
+.ig-cmt { font-size: 13.5px; }
+.pc-off { background: #1a1d23; display: grid; place-items: center; }
+.pc-off .off-msg { text-align: center; color: #8a8f99; }
+.pc-off .off-msg b { display: block; font-size: 15px; color: #c8ccd4; }
+.pc-off .off-msg small { display: block; margin-top: 6px; font-size: 12.5px; }
+.pc-sys { cursor: default; }
+.pc-sys .sys-ico { width: 116px; height: 40px; flex: none; display: grid; place-items: center; color: #8a8f99; font-size: 18px; }
+.viewer .v-top { position: absolute; top: 50px; left: 0; right: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 4px 12px; color: #fff; }
+.viewer .v-top .x { position: static; font-size: 30px; line-height: 1; width: 30px; }
+.viewer .v-info { text-align: center; }
+.viewer .v-info b { display: block; font-size: 15px; }
+.viewer .v-info small { font-size: 12px; color: #c7c7cc; }
+.viewer .v-cap { position: absolute; left: 16px; right: 16px; bottom: 92px; color: #fff; font-size: 15px; text-align: center; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.viewer .v-bottom { position: absolute; left: 0; right: 0; bottom: 34px; display: flex; justify-content: space-around; color: #0a84ff; font-size: 20px; z-index: 5; }
+.viewer .ph { inset: 96px 0 150px; }
+.viewer .v-cap { bottom: 104px; }

@@ -66,7 +66,8 @@ const BANNERS = [
   { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
   { chat: 'rise', title: '라이즈🏀', sender: '경제 타로형', text: '은석 아직도 체육관이라고? 먼일이래' },
   { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '멀라요 문잠그는것만 까먹지 마요' },
-  { chat: 'rise', title: '라이즈🏀', sender: '은석이', text: '죽는다 이소희' }
+  // delay: 바로 앞 배너와의 간격(ms). 없으면 BANNER_TIMING.gap
+  { chat: 'rise', title: '라이즈🏀', sender: '은석이', text: '죽는다 이소희', delay: 5000 }
 ];
 
 /* ---------------- 카카오톡 ---------------- */
@@ -78,13 +79,17 @@ const KAKAO = {
     '미디 이소희': 'images/profile/sohee.jpg',
     '경제 타로형': 'images/profile/taro.jpg',
     '연영 박원빈': 'images/profile/wonbin.jpg',
+    '사회 강민석': 'images/profile/minseok.jpg',
     '연영 이찬영': 'images/profile/chanyoung.jpg',
     '연영 앤톤리': 'images/profile/anton.jpg',
     '은영 누나': 'images/profile/eunyoung.jpg',
-    '기획부장': 'images/profile/planner.jpg',
-    '김희수': 'images/profile/heesu.jpg',
-    '연주': 'images/profile/yeonju.jpg',
-    '유은': 'images/profile/yueun.jpg',
+    '홍동기획 강성하': 'images/profile/seongha.jpg',
+    '홍동 김희수': 'images/profile/heesu.jpg',
+    '홍동 손연주': 'images/profile/yeonju.jpg',
+    '홍동 이유은': 'images/profile/yueun.jpg',
+    '미윤': 'images/profile/miyun.jpg',
+    '지원 (홍대)': 'images/profile/jiwon.jpg',
+    '채린': 'images/profile/chaerin.jpg',
     '체교 한도윤': 'images/profile/doyoon.jpg'
   },
   chats: [
@@ -113,8 +118,7 @@ const KAKAO = {
         { from: '경제 타로형', text: '머리 넘 떡칠한거 아냐?', t: '오전 10:49' },
         { date: '2026-05-29' },
         { from: '미디 이소희', text: '코치님이 다음주부터 훈련 강도 올린대요', t: '오후 9:12' },
-        { from: '연영 박원빈', text: '아 진짜 메이저리그도 아니고', t: '오후 9:13' },
-        { from: '경제 타로형', text: '성찬이 찬성해서 그럼ㅋㅋ', t: '오후 9:13' },
+        { from: '사회 강민석', text: '아 진짜 메이저리그도 아니고', t: '오후 9:13' },
         { date: '2026-06-03' },
         // ↓ 이 아래는 배너와 함께 실시간으로 추가돼요 (BANNERS)
       ]
@@ -174,16 +178,33 @@ const KAKAO = {
         { date: '2026-05-13' },
         { from: '은영 누나', text: '축제 둘째날 부스 사진 올립니다', t: '오후 9:30' },
         { from: '은영 누나', type: 'photo', src: 'images/kakao/alive-festival.jpg', label: '축제 부스에서 웃고 있는 성찬', t: '오후 9:30' },
-        { from: '연주', text: '성찬선배 오픈런 실화예요?', t: '오후 9:32' },
-        { from: 'me', text: '내 인기 어쩔', t: '오후 9:40' },
+        { from: '홍동 손연주', text: '성찬선배 오픈런 실화예요?', t: '오후 9:32' },
+        { from: 'me', text: '이게 나야아ㅏ', t: '오후 9:40' },
         { date: '2026-06-02' },
         { from: '은영 누나', text: '[공지] 책자 1차 촬영 6/11(목) 확정!', t: '오후 6:20' },
         { from: '은영 누나', text: '도서관 열람실 → 본관 앞 계단 순서. 단복이랑 사복 한 벌씩 챙겨', t: '오후 6:20' },
-        { from: '기획부장', text: '콘티 공유드립니다', t: '오후 6:24' },
-        { from: '기획부장', type: 'file', text: '2026_홍보책자_콘티_v2.pdf', t: '오후 6:24' },
-        { from: '기획부장', text: '2차 날짜는 내일 공지할게요', t: '오후 6:25' },
-        { from: '김희수', text: '넵! 감사합니다', t: '오후 6:31' },
-        { from: '유은', text: '넵넵', t: '오후 6:33' }
+        { from: '홍동기획 강성하', text: '콘티 공유드립니다', t: '오후 6:24' },
+        { from: '홍동기획 강성하', type: 'file', text: '2026_홍보책자_콘티_v2.pdf', t: '오후 6:24' },
+        { from: '홍동기획 강성하', text: '2차 날짜는 내일 공지할게요', t: '오후 6:25' },
+        { from: '홍동 김희수', text: '넵! 감사합니다', t: '오후 6:31' },
+        { from: '홍동 이유은', text: '넵넵', t: '오후 6:33' }
+      ]
+    },
+    {
+      // 미련 남은 전여친. 성찬이 읽고 답장 안 함(읽씹) → 안 읽은 숫자 없음
+      id: 'ex', name: '미윤', avatar: 'images/profile/miyun.jpg', unread: 0,
+      messages: [
+        { date: '2026-04-18' },
+        { from: '미윤', text: '잘 지내?', t: '오후 11:58' },
+        { from: '미윤', text: '그냥 생각나서', t: '오후 11:58' },
+        { date: '2026-05-16' },
+        { from: '미윤', text: '축제 사진 봤어ㅋㅋ 여전하더라', t: '오전 1:12' },
+        { date: '2026-06-02' },
+        { from: '미윤', text: '자?', t: '오후 11:47' },
+        { from: '미윤', text: '오늘 너네 학교 앞 지나가다가 생각나서', t: '오후 11:47' },
+        { from: '미윤', text: '겨울이는 잘 있어?', t: '오후 11:52' },
+        { date: '2026-06-03' },
+        { from: '미윤', text: '답장 안 해도 돼', t: '오전 12:05' }
       ]
     },
     {
@@ -209,6 +230,25 @@ const KAKAO = {
         { date: '2026-06-01' },
         { from: '총무', text: '이번주 일요일 9시 춘천 구장 투표 부탁드립니다', t: '오후 10:02' },
         { type: 'vote', text: '6/7(일) 춘천 원정 참석 투표', t: '오후 10:02', from: '총무' }
+      ]
+    },
+    {
+      // 원나잇 추정 ①
+      id: 'on1', name: '지원 (홍대)', avatar: 'images/profile/jiwon.jpg', unread: 0,
+      messages: [
+        { date: '2026-03-15' },
+        { from: '지원 (홍대)', text: '잘 들어갔어?ㅎㅎ', t: '오전 11:20' },
+        { from: 'me', text: 'ㅇㅇ', t: '오후 3:02', read: true },
+        { from: '지원 (홍대)', text: '담에 또 홍대 오면 연락해', t: '오후 3:05' }
+      ]
+    },
+    {
+      // 원나잇 추정 ②
+      id: 'on2', name: '채린', avatar: 'images/profile/chaerin.jpg', unread: 0,
+      messages: [
+        { date: '2026-02-21' },
+        { from: '채린', text: '번호 이거 맞지?', t: '오전 4:41' },
+        { from: '채린', text: '내 이어링 거기 떨어져 있으면 버려줘', t: '오후 1:16' }
       ]
     },
     {
@@ -311,8 +351,7 @@ const EVERYTIME = {
           { name: '라이즈 연습', room: '체육관', color: '#c4c4c8', slots: [['목', 16, 19]] }
         ] },
       { name: '이소희', open: false },
-      { name: '쇼타로', open: false },
-      { name: '한도윤', open: false }
+      { name: '오사키 쇼타로', open: false }
     ]
   },
   messages: [] // 쪽지함 (비어 있음)
@@ -320,7 +359,9 @@ const EVERYTIME = {
 
 /* ---------------- 인스타그램 ---------------- */
 const INSTAGRAM = {
-  me: { id: 'jeong.sc', name: '정성찬', avatar: 'images/profile/seongchan.jpg', posts: 23, followers: '2,184', following: 301, bio: '🏀⚽ 체육교육\n겨울이 아빠 🐶' },
+  me: { id: 'jeong.sc', name: '정성찬', avatar: 'images/profile/seongchan.jpg', posts: 23, followers: '2,184', following: 301, bio: '🏀⚽ 체육교육\n겨울이 아빠 🐶', grid: 9,
+    // 내 스토리 (회색 테두리 = 이미 올린 것)
+    stories: [{ img: 'images/instagram/story-me.jpg', label: '성찬 스토리 사진', caption: '', ago: '15시간' }] },
   recentSearch: [
     { id: 'heesu.k', name: '김희수', avatar: 'images/instagram/heesu-avatar.jpg' },
     { id: 'alive.youngwon', name: '영원대 홍보대사 얼라이브', avatar: 'images/instagram/alive-avatar.jpg' }
@@ -337,7 +378,13 @@ const INSTAGRAM = {
     ]}
   },
   feed: [
-    { user: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.jpg', img: 'images/instagram/alive-post.jpg', label: '성찬과 은석 투샷 (10화)', likes: '1,027', caption: '여자라면 영원대 💙 #영원대 #얼라이브 #홍보대사', time: '1주 전' }
+    { user: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.jpg', img: 'images/instagram/alive-post.jpg', label: '성찬과 은석 투샷 (10화)', likes: '1,027', caption: '여자라면 영원대 💙 #영원대 #얼라이브 #홍보대사', time: '1주 전',
+      comments: [
+        { id: 'seow_1', text: '영원대 가려고 방금 자퇴하고 옴' },
+        { id: 'imnotgay', text: '내남자들 찾았다' },
+        { id: 'ggu_guu_y', text: '진짜존나잘생ㅅ겼네' },
+        { id: 'n._.n22', text: '인스타정보' }
+      ] }
   ],
   heesu: {
     id: 'heesu.k', name: '김희수', avatar: 'images/instagram/heesu-avatar.jpg',
@@ -357,9 +404,10 @@ const INSTAGRAM = {
 const PETCAM = {
   cams: [
     { id: 'living', name: '거실', live: 'images/petcam/live-living.jpg', liveLabel: '빈 거실, 소파 위 터그 장난감' },
-    { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '불 꺼진 침실, 이불 걷어찬 침대' }
+    // 5/22 아침 이후로 침실 캠은 꺼 둠
+    { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '', off: true, offSince: '5월 22일 오전 8:31' }
   ],
-  // blur:true → 썸네일 흐리게, 재생 안 됨
+  // blur:true → 썸네일 흐리게, 재생 안 됨 / .gif 파일을 넣으면 움짤로 재생돼요
   clips: [
     { date: '2026-06-03', items: [
       { cam: 'living', time: '01:51', tag: '움직임 감지', img: 'images/petcam/clip-0603-0151.jpg', label: '현관으로 뛰어가는 성찬, 따라 나온 겨울이' }
@@ -367,6 +415,13 @@ const PETCAM = {
     { date: '2026-05-25', items: [
       { cam: 'living', time: '21:46', tag: '사람 감지', img: 'images/petcam/clip-0525-2146.jpg', label: '부엌 쪽, 화면 밖', blur: true },
       { cam: 'living', time: '20:12', tag: '움직임 감지', img: 'images/petcam/clip-0525-2012.jpg', label: '산책 다녀온 겨울이' }
+    ]},
+    { date: '2026-05-22', items: [
+      { cam: 'bedroom', time: '08:31', tag: '카메라 꺼짐', img: '', label: '', system: true },
+      { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.gif', label: '아침 상황 (움짤)', star: true }
+    ]},
+    { date: '2026-05-21', items: [
+      { cam: 'bedroom', time: '03:12', tag: '사람 감지', img: 'images/petcam/clip-0521-0312.jpg', label: '침실', blur: true }
     ]},
     { date: '2026-04-07', items: [
       { cam: 'bedroom', time: '23:31', tag: '사람 감지', img: 'images/petcam/clip-0407-2331.jpg', label: '캠을 요리조리 살피는 은석', blur: true, star: true },
@@ -414,19 +469,25 @@ const ALARMS = [
 /* ---------------- 앨범 ---------------- */
 // 파일을 images/album/ 에 같은 이름으로 넣으면 보여요
 const ALBUM = {
+  // 최신순. date/time/place는 사진을 열면 위에 뜨고, caption은 아래에 떠요.
+  // 은석 자는 사진(eunseok-*)은 은석이 자고 간 날 새벽 → 카톡·펫캠·캘린더 날짜와 맞물려요
   recent: [
-    { src: 'images/album/01.jpg', label: '자는 겨울이 (6/3 00:23)' },
-    { src: 'images/album/02.jpg', label: '희수 스토리 캡처 - 칵테일바' },
-    { src: 'images/album/03.jpg', label: '희수 스토리 캡처 - 아부라소바' },
-    { src: 'images/album/04.jpg', label: '은석 단복 (단톡에서 저장)' },
-    { src: 'images/album/05.jpg', label: '축제 부스' },
-    { src: 'images/album/06.jpg', label: '겨울이 터그놀이' },
-    { src: 'images/album/07.jpg', label: '겨울이' },
-    { src: 'images/album/08.jpg', label: '겨울이' },
-    { src: 'images/album/09.jpg', label: '춘천 축구' },
-    { src: 'images/album/10.jpg', label: '엠티' },
-    { src: 'images/album/11.jpg', label: '겨울이 산책' },
-    { src: 'images/album/12.jpg', label: '겨울이 아기 때' }
+    { src: 'images/album/01.jpg', label: '자는 겨울이', date: '2026-06-03', time: '오전 12:23', place: '집', caption: '우리 애기 코 자' },
+    { src: 'images/album/02.jpg', label: '희수 스토리 캡처 - 칵테일바', date: '2026-06-03', time: '오전 1:48', type: '스크린샷' },
+    { src: 'images/album/03.jpg', label: '희수 스토리 캡처 - 아부라소바', date: '2026-06-02', time: '오후 6:05', type: '스크린샷' },
+    { src: 'images/album/eunseok-0525.jpg', label: '자는 은석', date: '2026-05-25', time: '오전 5:12', place: '집', caption: '1교시 어떡하냐 얘' },
+    { src: 'images/album/eunseok-0521.jpg', label: '자는 은석', date: '2026-05-21', time: '오전 3:40', place: '집', caption: '넥타이 그대로 잠듦ㅋㅋ' },
+    { src: 'images/album/04.jpg', label: '은석 단복 (단톡에서 저장)', date: '2026-05-20', time: '오전 10:48' },
+    { src: 'images/album/eunseok-0515.jpg', label: '자는 은석', date: '2026-05-15', time: '오전 4:20', place: '집', caption: '축제 끝. 기절' },
+    { src: 'images/album/05.jpg', label: '축제 부스', date: '2026-05-13', time: '오후 3:02', place: '영원대학교' },
+    { src: 'images/album/06.jpg', label: '겨울이 터그놀이', date: '2026-05-10', time: '오후 8:41', place: '집' },
+    { src: 'images/album/07.jpg', label: '겨울이', date: '2026-05-02', time: '오전 11:15', place: '집' },
+    { src: 'images/album/08.jpg', label: '겨울이', date: '2026-04-20', time: '오후 9:30', place: '집' },
+    { src: 'images/album/eunseok-0408.jpg', label: '자는 은석', date: '2026-04-08', time: '오전 3:05', place: '집', caption: '또 내 베개 뺏음' },
+    { src: 'images/album/09.jpg', label: '춘천 축구', date: '2026-04-05', time: '오전 10:27', place: '춘천' },
+    { src: 'images/album/10.jpg', label: '엠티', date: '2026-04-03', time: '오후 10:14', place: '가평' },
+    { src: 'images/album/11.jpg', label: '겨울이 산책', date: '2026-03-28', time: '오후 5:50', place: '집' },
+    { src: 'images/album/12.jpg', label: '겨울이 아기 때', date: '2024-11-02', time: '오후 2:16', place: '집' }
   ],
   albums: [
     { name: '겨울이🐶', count: 1208, cover: 'images/album/06.jpg' },
@@ -444,6 +505,8 @@ const MEMOS = [
 
 /* ---------------- 전화 ---------------- */
 const CALLS = [
+  // 위에서부터 최신순. count = 같은 날 연달아 건 횟수
+  { name: '은석이', type: 'out', time: '오전 1:31', count: 4, note: '응답 없음' },   // 6/3 새벽 (11화)
   { name: '미디 이소희', type: 'out', time: '6월 1일' },
   { name: '체교 한도윤', type: 'in', time: '5월 25일' },
   { name: '동물병원', type: 'out', time: '5월 20일' },
@@ -453,8 +516,8 @@ const CALLS = [
   { name: '은석이', type: 'out', time: '5월 8일', note: '응답 없음' },
   { name: '은영 누나', type: 'in', time: '5월 7일' },
   { name: '은석이', type: 'in', time: '4월 21일' },
-  { name: '은석이', type: 'out', time: '4월 7일' },
-  { name: '은석이', type: 'out', time: '4월 6일', count: 3, note: '응답 없음' }
+  { name: '은석이', type: 'out', time: '4월 7일' },                              // 펫캠 이후 처음 마주한 날, 새벽
+  { name: '은석이', type: 'out', time: '4월 6일', count: 7, note: '응답 없음' }      // 펫캠 사건, 교양 결석 후 연락 두절
 ];
 
 /* ---------------- 메시지(문자) ---------------- */
@@ -462,7 +525,7 @@ const SMS = [
   { from: 'CJ대한통운', text: '[Web발신] 고객님의 상품(연어 사료 1.8kg)이 배송 완료되었습니다.', time: '오후 2:14', unread: true },
   { from: '010-0000-0000', text: '[Web발신] 영원헬스 3개월 99,000원 이번주까지!', time: '어제', unread: true },
   { from: '동물병원', text: '겨울이 보호자님, 6월 22일 예방접종 예약 안내드립니다.', time: '5월 30일', unread: true },
-  { from: '엄마', text: '밥은 먹고 다니니', time: '5월 28일' }
+  { from: '바이레도', text: '(광고)[BYREDO] 블랑쉬 오 드 퍼퓸 회원 전용 15% 할인 코드: BLANCHE15 (~6/7까지) 무료수신거부 080-000-0000', time: '5월 27일', unread: false }
 ];
 
 /* ---------------- 크롬 ---------------- */
@@ -472,25 +535,26 @@ const CHROME = {
     'X연애 출연자',
     '공일대 무용과',
     '아부라소바 양파 많이',
+    '손흥민',
     '말티즈 간식'
   ]
 };
 
 /* ---------------- aiAsk (가상 AI) ---------------- */
 const AIASK = [
+  { date: '4월 14일' },
+  { role: 'user', type: 'photo', src: 'images/aiask/professor.jpg', label: '운동생리학 교수님 사진' },
+  { role: 'user', text: '이 교수님 관상 보고 중간고사에 낼 것 같은 문제 골라줘' },
+  { role: 'ai', text: '얼굴만 보고 시험 문제를 맞히는 건 제가 할 수 없어요. 😅\n\n대신 확실한 방법이 있어요.\n\n1. 수업 중에 "이건 중요하다"고 두 번 이상 말한 부분\n2. 쪽지시험에서 틀린 사람이 많았던 단원\n3. 강의자료에 굵게 표시된 개념\n\n강의자료를 보내 주시면 예상 문제를 같이 정리해 드릴게요.' },
+  { role: 'user', text: '아니 관상으로' },
+  { role: 'user', text: '눈썹이 좀 깐깐해 보이지 않음? 서술형 낼 상임?' },
+  { role: 'ai', text: '눈썹으로 출제 경향을 알 수 있다는 근거는 없어요. 다만 서술형이 나온다면 \'운동 중 에너지 대사 과정\'은 단골 주제예요. 그것부터 정리해 볼까요?' },
+  { role: 'user', text: 'ㅇㅋ 그거 외울게 땡큐' },
   { date: '5월 27일' },
   { role: 'user', text: '친구가 나한테 키스하려다가 내가 피했는데 다음날 완전 아무렇지 않게 굴면 무슨 심리임?' },
   { role: 'ai', text: '상황만으로 단정하긴 어렵지만, 몇 가지 가능성이 있어요.\n\n1. 정말로 별 의미가 없었을 수 있어요.\n2. 거절당했다고 느껴서 일부러 덤덤하게 구는 걸 수도 있어요.\n3. 두 사람 관계가 어색해질까 봐 먼저 선을 그은 걸 수도 있어요.\n\n궁금하다면 직접 물어보는 게 가장 정확해요. 혹시 피한 이유가 싫어서였나요?' },
   { role: 'user', text: '아니 싫은건 아닌데' },
-  { role: 'user', text: '아 됐다' },
-  { date: '6월 1일' },
-  { role: 'user', type: 'photo', src: 'images/aiask/professor.jpg', label: '운동생리학 교수님 사진' },
-  { role: 'user', text: '이 교수님 관상 보고 기말에 낼 것 같은 문제 골라줘' },
-  { role: 'ai', text: '얼굴만 보고 시험 문제를 맞히는 건 제가 할 수 없어요. 😅\n\n대신 확실한 방법이 있어요.\n\n1. 수업 중에 "이건 중요하다"고 두 번 이상 말한 부분\n2. 중간고사에서 틀린 사람이 많았던 단원\n3. 강의자료에 굵게 표시된 개념\n\n강의자료를 보내 주시면 예상 문제를 같이 정리해 드릴게요.' },
-  { role: 'user', text: '아니 관상으로' },
-  { role: 'user', text: '눈썹이 좀 깐깐해 보이지 않음? 서술형 낼 상임?' },
-  { role: 'ai', text: '눈썹으로 출제 경향을 알 수 있다는 근거는 없어요. 다만 서술형이 나온다면 \'운동 중 에너지 대사 과정\'은 단골 주제예요. 그것부터 정리해 볼까요?' },
-  { role: 'user', text: 'ㅇㅋ 그거 외울게 땡큐' }
+  { role: 'user', text: '아 됐다' }
 ];
 
 /* ---------------- YouTube ---------------- */
@@ -509,8 +573,8 @@ const FOTMOB = [
 
 /* ---------------- 지도 ---------------- */
 const MAP_PINS = [
-  { name: '후문 아부라소바', note: '은석 최애. 양파 무한', x: 62, y: 38, color: '#ff9f0a' },
-  { name: '영원대 체육관', note: '야간 개방 ~ 자정', x: 40, y: 55, color: '#0a84ff' },
-  { name: '남자 기숙사', note: '통금 새벽 1시', x: 28, y: 30, color: '#8e8e93' },
-  { name: '집', note: '겨울이 기다리는 중', x: 75, y: 72, color: '#ff375f' }
+  { name: '후문 아부라소바', note: '', x: 62, y: 38, color: '#ff9f0a' },
+  { name: '영원대 체육관', note: '', x: 40, y: 55, color: '#0a84ff' },
+  { name: '남자 기숙사', note: '', x: 28, y: 30, color: '#8e8e93' },
+  { name: '집', note: '겨울이네', x: 75, y: 72, color: '#ff375f' }
 ];

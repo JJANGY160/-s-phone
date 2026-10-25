@@ -53,6 +53,30 @@
     return `${d.getMonth() + 1}월 ${d.getDate()}일`;
   }
 
+  /* ---------- 흐르는 시계 (CONFIG.now.time 에서 시작) ---------- */
+  const T0 = Date.now();
+  const [H0, M0] = CONFIG.now.time.split(':').map(Number);
+  function clockNow() {
+    const sec = H0 * 3600 + M0 * 60 + Math.floor((Date.now() - T0) / 1000);
+    return { h: Math.floor(sec / 3600) % 24, m: Math.floor(sec / 60) % 60, s: sec % 60 };
+  }
+  const hm = (c = clockNow()) => `${c.h % 12 || 12}:${String(c.m).padStart(2, '0')}`;
+  const ampm = (c = clockNow()) => `${c.h < 12 ? '오전' : '오후'} ${hm(c)}`;
+  const hands = (c = clockNow()) => ({ h: (c.h % 12) * 30 + c.m * 0.5, m: c.m * 6 + c.s * 0.1, s: c.s * 6 });
+  setInterval(() => {
+    const c = clockNow();
+    const t = hm(c);
+    document.querySelectorAll('[data-clock]').forEach((el) => { if (el.textContent !== t) el.textContent = t; });
+    const hd = hands(c);
+    document.querySelectorAll('.clock-ico .dial').forEach((d) => {
+      d.querySelector('.h').style.transform = `translateX(-50%) rotate(${hd.h}deg)`;
+      d.querySelector('.m').style.transform = `translateX(-50%) rotate(${hd.m}deg)`;
+      d.querySelector('.s').style.transform = `translateX(-50%) rotate(${hd.s}deg)`;
+    });
+    const ts = document.getElementById('pcTs');
+    if (ts) ts.textContent = `2026-06-03 ${String(c.h).padStart(2, '0')}:${String(c.m).padStart(2, '0')}:${String(c.s).padStart(2, '0')}`;
+  }, 1000);
+
   /* ---------- 상태바 ---------- */
   function renderStatus(mode) {
     if (mode === 'hidden') { statusEl.className = 'statusbar hidden'; return; }
@@ -60,7 +84,7 @@
     const showTime = mode !== 'lock';
     statusEl.innerHTML = `
       <div class="left">
-        ${showTime ? `<span>${CONFIG.now.time}</span>` : ''}
+        ${showTime ? `<span data-clock>${hm()}</span>` : ''}
         ${showTime ? `<span class="sb-music">♫ <span>${esc(CONFIG.nowPlaying.title)} · ${esc(CONFIG.nowPlaying.artist)}</span></span>` : ''}
       </div>
       <div class="right">
@@ -79,8 +103,8 @@
       inner = `<span class="d">${CONFIG.now.dayShort}</span><span class="n">${CONFIG.now.day}</span>`;
     } else if (app.glyph === 'clock') {
       cls = 'clock-ico';
-      const [h, m] = CONFIG.now.time.split(':').map(Number);
-      inner = `<div class="dial"><i class="h" style="transform:translateX(-50%) rotate(${(h % 12) * 30 + m * 0.5}deg)"></i><i class="m" style="transform:translateX(-50%) rotate(${m * 6}deg)"></i><i class="s" style="transform:translateX(-50%) rotate(140deg)"></i></div>`;
+      const hd = hands();
+      inner = `<div class="dial"><i class="h" style="transform:translateX(-50%) rotate(${hd.h}deg)"></i><i class="m" style="transform:translateX(-50%) rotate(${hd.m}deg)"></i><i class="s" style="transform:translateX(-50%) rotate(${hd.s}deg)"></i></div>`;
     } else if (app.glyph === 'TALK') {
       inner = `<span style="font-size:17px;font-weight:900;color:${app.glyphColor}">TALK</span>`;
     } else {
@@ -106,7 +130,7 @@
       <div class="content">
         <div class="lock-ico">🔒</div>
         <div class="date">${esc(CONFIG.now.dateLabel)}</div>
-        <div class="time">${CONFIG.now.time}</div>
+        <div class="time" data-clock>${hm()}</div>
         <div class="notifs">
           ${LOCK_NOTIFS.map((n) => `
             <div class="notif">
@@ -289,11 +313,15 @@
   function startBanners() {
     if (state.bannersStarted) return;
     state.bannersStarted = true;
-    BANNERS.forEach((b, i) => setTimeout(() => showBanner(b, i), BANNER_TIMING.firstDelay + i * BANNER_TIMING.gap));
+    let t = BANNER_TIMING.firstDelay;
+    BANNERS.forEach((b, i) => {
+      if (i > 0) t += b.delay ?? BANNER_TIMING.gap;
+      setTimeout(() => showBanner(b, i), t);
+    });
   }
   function showBanner(b, i) {
     const chat = chatById(b.chat);
-    const msg = { from: b.sender, text: b.text, t: '오전 1:53', _new: true };
+    const msg = { from: b.sender, text: b.text, t: ampm(), _new: true };
     chat.messages.push(msg);
     const cur = currentScreen();
     const inRoom = cur && cur.name === 'kakaoRoom' && cur.params.id === b.chat;
@@ -364,7 +392,7 @@
         <div class="et-ad"><small>광고</small>${esc(ET.ad)}</div>
         <div class="et-card">
           <h3>자주 찾는 게시판 <small data-tab="etBoards">더 보기 ›</small></h3>
-          ${ET.homeBoards.map((b) => `<div class="b" data-go="etBoard" data-p="${P({ b: b.board })}"><b>${esc(b.name)}</b><span>${esc(b.preview)}</span></div>`).join('')}
+          ${ET.homeBoards.map((b) => `<div class="b"><b>${esc(b.name)}</b><span>${esc(b.preview)}</span></div>`).join('')}
         </div>
         <div class="pad-bottom" style="height:30px"></div>
         ${etTabs('everytime')}
@@ -430,7 +458,7 @@
       html: `<div class="scr et">
         <div class="tt-head"><h1>게시판</h1><span style="font-size:20px">🔍</span></div>
         <div class="et-boards">
-          ${bs.map(([k, n]) => `<div class="eb" data-go="etBoard" data-p="${P({ b: k })}"><span class="eb-ico">📌</span>${esc(n)}</div>`).join('')}
+          ${bs.map(([k, n]) => `<div class="eb eb-off"><span class="eb-ico">📌</span>${esc(n)}</div>`).join('')}
           <div class="eb-line"></div>
           <div class="eb eb-off"><span class="eb-ico">📝</span>내가 쓴 글</div>
           <div class="eb" data-go="etScrap"><span class="eb-ico">⭐</span>스크랩한 글</div>
@@ -538,7 +566,7 @@
   /* ---------- 인스타그램 ---------- */
   const IG = INSTAGRAM;
   function igTabs() {
-    return `<div class="ig-tabs"><span data-tab="instagram">⌂</span><span data-tab="igSearch">⌕</span><span data-toast="새 게시물">⊕</span><span data-toast="릴스">▶</span><span class="me" data-toast="${esc(IG.me.id)}">${ph(IG.me.avatar, '', 'round')}</span></div>`;
+    return `<div class="ig-tabs"><span data-tab="instagram">⌂</span><span data-tab="igSearch">⌕</span><span data-toast="새 게시물">⊕</span><span data-toast="릴스">▶</span><span class="me" data-tab="igMe">${ph(IG.me.avatar, '', 'round')}</span></div>`;
   }
   const ring = (src, seen, extra = '') => `<div class="ring ${seen ? 'seen' : ''}" ${extra}><div class="in">${ph(src, '', 'round')}</div></div>`;
   S.instagram = () => ({
@@ -546,7 +574,7 @@
     html: `<div class="scr ig">
       <div class="ig-top"><span class="logo">Instagram</span><div class="ic"><span>♡</span><span class="dm">✉<i>2</i></span></div></div>
       <div class="stories">
-        <div class="story">${ring(IG.me.avatar, true)}<span>내 스토리</span></div>
+        <div class="story" data-go="igStory" data-p="${P({ u: 'me', i: 0 })}">${ring(IG.me.avatar, true)}<span>내 스토리</span></div>
         ${IG.storyBar.map((s) => { const has = s.id === IG.heesu.id || (IG.otherStories && IG.otherStories[s.id]); return `<div class="story" ${has ? `data-go="igStory" data-p="${P({ u: s.id, i: 0 })}"` : `data-toast="${esc(s.id)}"`}>${ring(s.avatar, s.seen)}<span>${esc(s.id)}</span></div>`; }).join('')}
       </div>
       ${IG.feed.map((f) => `<div class="ig-post">
@@ -555,6 +583,8 @@
         <div class="acts"><span>♡</span><span>💬</span><span>➤</span></div>
         <div class="tx"><b>좋아요 ${esc(f.likes)}개</b></div>
         <div class="tx"><b>${esc(f.user)}</b> ${esc(f.caption)}</div>
+        ${f.comments && f.comments.length ? `<div class="tx"><small>댓글 ${f.comments.length}개 모두 보기</small></div>
+        ${f.comments.map((c) => `<div class="tx ig-cmt"><b>${esc(c.id)}</b> ${esc(c.text)}</div>`).join('')}` : ''}
         <div class="tx"><small>${esc(f.time)}</small></div>
       </div>`).join('')}
       <div class="pad-bottom" style="height:20px"></div>
@@ -571,6 +601,26 @@
       ${igTabs()}
     </div>`
   });
+  S.igMe = () => {
+    const me = IG.me;
+    return {
+      status: 'normal', ui: 'dark',
+      html: `<div class="scr ig">
+        <div class="ig-prof-head">${esc(me.id)} <span style="margin-left:auto;font-size:22px;font-weight:400">⊕ ≡</span></div>
+        <div class="ig-prof">
+          <div class="r1">${ring(me.avatar, true, `data-go="igStory" data-p="${P({ u: 'me', i: 0 })}"`)}
+            <div class="stats"><div><b>${me.posts}</b>게시물</div><div><b>${me.followers}</b>팔로워</div><div><b>${me.following}</b>팔로잉</div></div>
+          </div>
+          <div class="nm">${esc(me.name)}</div>
+          <div class="bio">${esc(me.bio)}</div>
+          <div class="btns"><button>프로필 편집</button><button>프로필 공유</button></div>
+        </div>
+        <div class="ig-grid">${Array.from({ length: me.grid || 9 }, (_, i) => ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`)).join('')}</div>
+        <div class="pad-bottom" style="height:20px"></div>
+        ${igTabs()}
+      </div>`
+    };
+  };
   S.igProfile = () => {
     const h = IG.heesu;
     return {
@@ -591,7 +641,11 @@
     };
   };
   let storyTimer;
-  const storyOwner = (u) => (!u || u === IG.heesu.id ? IG.heesu : { id: u, ...IG.otherStories[u] });
+  const storyOwner = (u) => {
+    if (!u || u === IG.heesu.id) return IG.heesu;
+    if (u === 'me') return { ...IG.me, id: IG.me.id };
+    return { id: u, ...IG.otherStories[u] };
+  };
   S.igStory = ({ u, i = 0 }) => {
     const h = storyOwner(u);
     const s = h.stories[i];
@@ -645,14 +699,16 @@
       html: `<div class="scr pc">
         <div class="pc-head"><div><small>● 연결됨</small><h1>겨울이네 🐶</h1></div><span style="font-size:20px">⚙︎</span></div>
         <div class="pc-tabs">${PETCAM.cams.map((x) => `<button class="${x.id === cam ? 'on' : ''}" data-replace="petcam" data-p="${P({ cam: x.id })}">${esc(x.name)} 캠</button>`).join('')}</div>
-        <div class="pc-live">${ph(c.live, c.liveLabel, 'dark')}<span class="tag">LIVE</span><span class="ts">2026-06-03 01:53:${String(new Date().getSeconds()).padStart(2, '0')}</span></div>
+        ${c.off
+          ? `<div class="pc-live pc-off"><div class="off-msg"><b>📷 카메라가 꺼져 있어요</b><small>${esc(c.offSince)}에 꺼짐</small></div></div>`
+          : `<div class="pc-live">${ph(c.live, c.liveLabel, 'dark')}<span class="tag">LIVE</span><span class="ts" id="pcTs"></span></div>`}
         <div class="pc-ctrl">
           <div data-toast="말하기"><i>🎙</i>말하기</div><div data-toast="스냅샷 저장"><i>📸</i>스냅샷</div><div data-toast="녹화 시작"><i>⏺</i>녹화</div><div data-toast="간식 발사! (겨울이 없음)"><i>🦴</i>간식</div>
         </div>
         <h3>녹화 기록</h3>
         ${PETCAM.clips.map((g, gi) => `
           <div class="pc-date">${dateLabel(g.date)}</div>
-          ${g.items.map((it, ii) => `<div class="pc-clip" data-go="petcamClip" data-p="${P({ g: gi, i: ii })}">
+          ${g.items.map((it, ii) => it.system ? `<div class="pc-clip pc-sys"><span class="sys-ico">⏻</span><div><b>${esc(it.time)} · ${esc(it.tag)}</b><small>${esc(camName(it.cam))} 캠</small></div></div>` : `<div class="pc-clip" data-go="petcamClip" data-p="${P({ g: gi, i: ii })}">
             ${ph(it.img, it.blur ? '' : it.label, `dark ${it.blur ? 'blur' : ''}`)}
             <div><b>${esc(it.time)} · ${esc(it.tag)}</b><small>${esc(camName(it.cam))} 캠${it.blur ? ' · 🙈' : ''}</small></div>
             ${it.star ? '<span class="star">★</span>' : ''}
@@ -743,6 +799,7 @@
     html: `<div class="scr ph-app">
       <div class="navbar" style="background:#fff"><span class="title" style="margin:0;text-align:left;font-size:30px;font-weight:800">사진</span><span style="color:var(--ios-blue)">선택</span></div>
       <div class="ph-grid">${ALBUM.recent.map((p, i) => `<div data-go="albumView" data-p="${P({ i })}">${ph(p.src, p.label)}</div>`).join('')}</div>
+      <div style="text-align:center;color:#8e8e93;font-size:13px;padding:10px 0 0">사진 ${ALBUM.recent.length}장</div>
       <h3 style="padding:18px 16px 10px;font-size:21px">앨범</h3>
       <div class="albums">${ALBUM.albums.map((a) => `<div>${ph(a.cover, a.name)}<b>${esc(a.name)}</b><small>${a.count.toLocaleString()}</small></div>`).join('')}</div>
       <div class="pad-bottom"></div>
@@ -752,7 +809,14 @@
     const p = ALBUM.recent[i];
     return {
       status: 'normal', ui: 'light',
-      html: `<div class="scr viewer zoom-in"><button class="x" data-back>‹ 모든 사진</button>${ph(p.src, p.label, 'dark')}<div class="cap">${esc(p.label)}</div></div>`
+      html: `<div class="scr viewer zoom-in">
+        <div class="v-top"><button class="x" data-back>‹</button>
+          <div class="v-info"><b>${p.date ? esc(dateLabel(p.date).replace(/^\d+년 /, '')) : ''}</b><small>${esc(p.time || '')}${p.place ? ` · 📍${esc(p.place)}` : ''}${p.type ? ` · ${esc(p.type)}` : ''}</small></div>
+          <span style="width:30px"></span></div>
+        ${ph(p.src, p.label, 'dark')}
+        ${p.caption ? `<div class="v-cap">${esc(p.caption)}</div>` : ''}
+        <div class="v-bottom"><span>⇪</span><span>♡</span><span>ⓘ</span><span>🗑</span></div>
+      </div>`
     };
   };
 
@@ -791,11 +855,11 @@
   S.map = () => ({
     status: 'normal', ui: 'dark',
     html: `<div class="scr map">
-      <div class="canvas">${MAP_PINS.map((p) => `<div class="pin" style="left:${p.x}%;top:${p.y}%" data-toast="${esc(p.name)} · ${esc(p.note)}"><i style="background:${p.color}"></i><span>${esc(p.name)}</span></div>`).join('')}</div>
+      <div class="canvas">${MAP_PINS.map((p) => `<div class="pin" style="left:${p.x}%;top:${p.y}%" data-toast="${esc(p.name)}${p.note ? ' · ' + esc(p.note) : ''}"><i style="background:${p.color}"></i><span>${esc(p.name)}</span></div>`).join('')}</div>
       <div class="search">🔍 장소 검색</div>
       <div class="sheet"><div class="grab"></div>
         <div style="padding:0 16px 8px;font-weight:800;font-size:18px">즐겨찾기</div>
-        ${MAP_PINS.map((p) => `<div class="row" style="background:#fff;margin:0 12px 6px;border-radius:10px;border:0"><i style="width:30px;height:30px;border-radius:50%;background:${p.color};flex:none"></i><div class="grow"><b>${esc(p.name)}</b><div class="sub">${esc(p.note)}</div></div></div>`).join('')}
+        ${MAP_PINS.map((p) => `<div class="row" style="background:#fff;margin:0 12px 6px;border-radius:10px;border:0"><i style="width:30px;height:30px;border-radius:50%;background:${p.color};flex:none"></i><div class="grow"><b>${esc(p.name)}</b>${p.note ? `<div class="sub">${esc(p.note)}</div>` : ''}</div></div>`).join('')}
       </div>
     </div>`
   });
