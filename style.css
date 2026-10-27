@@ -745,3 +745,169 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ig-add .ph { width: 28px; height: 28px; flex: none; }
 .ig-add input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 14px; background: transparent; color: #111; user-select: text; -webkit-user-select: text; }
 .ig-add button { color: #0095f6; font-weight: 700; font-size: 14px; }
+
+/* =========================================================
+   인스타 리디자인 (5차): 선 아이콘 통일 · 반응 바 · 댓글 창
+   ========================================================= */
+.ig svg.i, .story-view svg.i, .dm svg.i { width: 24px; height: 24px; display: block; }
+.ig-top .ic { display: flex; gap: 20px; align-items: center; }
+.ig-top .ic .dm { position: relative; }
+.ig-top .ic .dm i { position: absolute; top: -6px; right: -8px; background: #ff3040; color: #fff; font-style: normal; font-size: 10.5px; font-weight: 700; border-radius: 9px; min-width: 17px; height: 17px; display: grid; place-items: center; padding: 0 4px; border: 2px solid #fff; }
+.ig-tabs { display: flex; justify-content: space-around; align-items: center; padding: 10px 0 30px; color: #111; font-size: 0; }
+.ig-tabs > span { cursor: pointer; display: grid; place-items: center; width: 44px; height: 30px; }
+.ig-tabs > span svg.i { width: 26px; height: 26px; }
+.ig-tabs > span.on svg.i { stroke-width: 2.6; }
+.ig-tabs .me .ph { width: 26px; height: 26px; border: 0; }
+.ig-tabs .me.on .ph { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111; }
+
+.ig-post .hd { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+.ig-post .hd b { font-size: 14px; font-weight: 700; }
+.ig-post .hd .more { margin-left: auto; color: #111; }
+.ig-post .hd .more svg.i { width: 20px; height: 20px; }
+.ig-post .pic-wrap { position: relative; }
+.ig-post .likers { position: absolute; left: 12px; bottom: 12px; z-index: 3; display: flex; }
+.ig-post .likers .lk { position: relative; width: 38px; height: 38px; margin-right: -6px; }
+.ig-post .likers .lk .ph { width: 38px; height: 38px; border: 2px solid rgba(255,255,255,.95); }
+.ig-post .likers .lk i { position: absolute; right: -3px; bottom: -3px; z-index: 4; width: 17px; height: 17px; border-radius: 50%; background: linear-gradient(135deg, #ff5f6d, #e1306c); color: #fff; font-style: normal; font-size: 10px; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.ig-post .bar { display: flex; align-items: center; gap: 16px; padding: 10px 14px 6px; color: #111; }
+.ig-post .bar .b { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.ig-post .bar .b em { font-style: normal; font-size: 14px; font-weight: 600; }
+.ig-post .bar .save { margin-left: auto; }
+.ig-post .bar .b.liked { color: #ff3040; }
+.ig-post .bar .b.liked svg.i { fill: #ff3040; stroke: #ff3040; }
+.ig-post .bar .b.liked em { color: #111; }
+.ig-post .bar .b.pop svg.i { animation: likePop .35s; }
+@keyframes likePop { 40% { transform: scale(1.3); } }
+.ig-post .bar .save.on svg.i { fill: #111; }
+.ig-post .tx { padding: 2px 14px; font-size: 14px; line-height: 1.45; }
+.ig-post .more-c { color: #8e8e8e; cursor: pointer; padding-top: 4px; }
+.ig-post .when { color: #8e8e8e; font-size: 12px; padding-bottom: 14px; }
+
+.ig-search .box { display: flex; align-items: center; gap: 8px; color: #8e8e8e; }
+.ig-search .box svg.i { width: 18px; height: 18px; }
+.ig-search .box .typed { color: #111; }
+.ig-user .x { color: #8e8e8e; }
+.ig-user .x svg.i { width: 18px; height: 18px; }
+.ig-prof-head { display: flex; align-items: center; gap: 10px; }
+.ig-prof-head .bk { display: grid; place-items: center; }
+.ig-prof-head .hd-ic { margin-left: auto; display: flex; gap: 20px; }
+.story-view .who .x svg.i { width: 26px; height: 26px; stroke: #fff; }
+.story-view .reply span svg.i { width: 26px; height: 26px; stroke: #fff; }
+.dm-head .bk { display: grid; place-items: center; }
+.dm-input .cam { display: grid; place-items: center; background: #3797f0; color: #fff; border-radius: 50%; width: 32px; height: 32px; flex: none; }
+.dm-input .cam svg.i { width: 18px; height: 18px; }
+
+/* 댓글 창 (아래에서 올라오는 시트) */
+.sheet-layer { position: absolute; inset: 0; z-index: 75; pointer-events: none; }
+.sheet-layer.open { pointer-events: auto; }
+.cs-dim { position: absolute; inset: 0; background: rgba(0,0,0,.35); animation: fadeIn .2s; }
+@keyframes fadeIn { from { opacity: 0; } }
+.cs {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 72%;
+  background: #fff; border-radius: 22px 22px 0 0; display: flex; flex-direction: column;
+  animation: sheetUp .3s cubic-bezier(.2,.8,.2,1); color: #111;
+}
+@keyframes sheetUp { from { transform: translateY(100%); } }
+.cs-grab { padding: 10px 0 4px; cursor: pointer; }
+.cs-grab i { display: block; width: 40px; height: 4px; border-radius: 2px; background: #c7c7cc; margin: 0 auto; }
+.cs-title { text-align: center; font-weight: 700; font-size: 15px; padding: 6px 0 10px; border-bottom: .5px solid #efefef; }
+.cs-list { flex: 1; overflow-y: auto; padding: 6px 0; scrollbar-width: none; }
+.cs-list::-webkit-scrollbar { display: none; }
+.cs-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding-bottom: 40px; }
+.cs-empty b { font-size: 22px; font-weight: 800; }
+.cs-empty small { color: #8e8e8e; font-size: 14px; }
+.cs-row { display: flex; gap: 12px; padding: 10px 16px; align-items: flex-start; }
+.cs-row.reply { padding-left: 62px; }
+.cs-ava { width: 34px; height: 34px; flex: none; border-radius: 50%; overflow: hidden; background: #efeff4; }
+.cs-row.reply .cs-ava { width: 26px; height: 26px; }
+.cs-ava .ph { width: 100%; height: 100%; }
+.cs-ava svg.i { width: 100%; height: 100%; display: block; }
+.cs-body { flex: 1; min-width: 0; }
+.cs-meta { display: flex; gap: 6px; align-items: baseline; }
+.cs-meta b { font-size: 13px; font-weight: 700; }
+.cs-meta small { font-size: 12px; color: #8e8e8e; }
+.cs-text { font-size: 14px; line-height: 1.4; margin-top: 2px; word-break: break-word; }
+.cs-text .mention { color: #00376b; }
+.cs-sub { font-size: 12px; color: #8e8e8e; font-weight: 600; margin-top: 6px; }
+.cs-like { color: #8e8e8e; padding-top: 10px; cursor: pointer; }
+.cs-like svg.i { width: 14px; height: 14px; display: block; }
+.cs-like.on { color: #ff3040; }
+.cs-like.on svg.i { fill: #ff3040; }
+.cs-emoji { display: flex; justify-content: space-between; padding: 10px 16px 6px; border-top: .5px solid #efefef; }
+.cs-emoji button { font-size: 26px; line-height: 1; padding: 2px; }
+.cs-emoji button:active { transform: scale(1.2); }
+.cs-input { display: flex; align-items: center; gap: 10px; padding: 8px 14px 30px; }
+.cs-me { width: 38px; height: 38px; flex: none; }
+.cs-me .ph { width: 100%; height: 100%; }
+.cs-box { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; border: 1px solid #dbdbdb; border-radius: 22px; padding: 9px 12px 9px 16px; }
+.cs-box input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 14.5px; color: #111; user-select: text; -webkit-user-select: text; }
+.cs-box input::placeholder { color: #8e8e8e; }
+.cs-tools { display: flex; gap: 12px; color: #111; }
+.cs-tools svg.i { width: 22px; height: 22px; }
+.cs-post { display: none; color: #0095f6; font-weight: 700; font-size: 14.5px; }
+.cs-box.typing .cs-tools { display: none; }
+.cs-box.typing .cs-post { display: block; }
+
+/* =========================================================
+   6차 수정
+   ========================================================= */
+/* 카톡방: 메시지 영역만 스크롤 → 사진·프사가 입력칸 위로 못 올라옴 */
+.scr.room { overflow: hidden; display: flex; flex-direction: column; }
+.room .room-head { position: relative; flex: none; }
+.room .msgs { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.room .msgs::-webkit-scrollbar { display: none; }
+.room .room-input { position: relative; flex: none; }
+
+/* 상태바 음악: 아이콘과 글자 분리 */
+.sb-music { display: inline-flex; align-items: center; gap: 4px; max-width: 104px; padding: 2px 9px 2px 7px; }
+.sb-music b { flex: none; font-weight: 700; }
+.sb-music .mq { overflow: hidden; white-space: nowrap; min-width: 0; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.sb-music .mq span { display: inline-block; animation: marquee 8s linear infinite; }
+
+/* 카카오톡 기본 프사 */
+.ph.kdef { background: #a9c1d6; }
+.ph.kdef::after { display: none; }
+.ph.kdef svg { width: 100%; height: 100%; display: block; }
+
+/* 홈 지도 위젯 (4×2) */
+.map-widget { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+.map-widget .mw-map { position: relative; width: 100%; height: 150px; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.map-widget .mw-roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mw-label { position: absolute; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: #5b6472; text-shadow: 0 0 3px #fff, 0 0 3px #fff; white-space: nowrap; z-index: 2; }
+.mw-pos { position: absolute; transform: translate(-50%, -100%); transition: left 1.4s cubic-bezier(.4,0,.2,1), top 1.4s cubic-bezier(.4,0,.2,1), opacity .5s, transform .5s; z-index: 3; }
+.mw-pos#mwEunseok { opacity: 0; transform: translate(-50%, -100%) scale(.4); }
+.mw-pos#mwEunseok.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+.mw-pin { display: flex; flex-direction: column; align-items: center; }
+.mw-pin .ph { width: 34px; height: 34px; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); background: #4c8bf5; }
+.mw-pin.es .ph { background: #8e6be8; }
+.mw-pin .ph::after { color: #fff; font-size: 11px; font-weight: 800; }
+.mw-pin.sc .ph::after, .mw-pin.es .ph::after { font-size: 11px; display: block; }
+.mw-pin .ph.round::after { font-size: 11px; }
+.mw-pin span { margin-top: 2px; background: #fff; color: #111; font-size: 9.5px; font-weight: 800; padding: 1px 6px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.mw-zoom { position: absolute; right: 10px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; background: #2f5a4c; color: #cfeee0; display: grid; place-items: center; z-index: 4; }
+.mw-zoom svg { width: 22px; height: 22px; }
+.map-widget .lbl { font-size: 11.5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+
+/* 펫캠 알림 배너 + 팝업 */
+.pc-banner .pc-ico { display: grid; place-items: center; font-size: 22px; background: linear-gradient(135deg,#7cc6ff,#3d7bff); border-radius: 13px; }
+.pop-layer { position: absolute; inset: 0; z-index: 85; pointer-events: none; }
+.pop-layer.open { pointer-events: auto; }
+.pp-dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); animation: fadeIn .2s; }
+.pp-card { position: absolute; left: 16px; right: 16px; top: 50%; transform: translateY(-50%); background: #0f1115; color: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); animation: popIn .3s cubic-bezier(.2,1.2,.3,1); }
+@keyframes popIn { from { transform: translateY(-46%) scale(.9); opacity: 0; } }
+.pp-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; }
+.pp-head .pp-app { color: #5ac8fa; font-size: 12px; font-weight: 700; }
+.pp-head b { font-size: 16px; }
+.pp-x { margin-left: auto; color: #aab; font-size: 16px; width: 28px; height: 28px; border-radius: 50%; background: #23262d; }
+.pp-media { position: relative; aspect-ratio: 16 / 11; margin: 0 12px; border-radius: 14px; overflow: hidden; }
+.pp-media .ph { width: 100%; height: 100%; }
+.pp-rec { position: absolute; top: 10px; left: 10px; z-index: 3; background: rgba(255,59,48,.9); font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; animation: pulse 1.4s infinite; }
+.pp-ts { position: absolute; bottom: 9px; left: 11px; z-index: 3; font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; text-shadow: 0 1px 3px #000; }
+.pp-text { padding: 12px 18px 4px; font-size: 14px; color: #c8ccd4; }
+.pp-btns { display: flex; gap: 8px; padding: 12px 14px 16px; }
+.pp-btns button { flex: 1; padding: 12px 0; border-radius: 12px; background: #23262d; font-weight: 700; font-size: 14.5px; }
+.pp-btns .pri { background: #3d7bff; }
+.mw-label::before { content: ''; display: block; width: 7px; height: 7px; border-radius: 50%; background: #ea4335; border: 1.5px solid #fff; margin: 0 auto 1px; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+
+/* 홈 막대는 댓글 창·팝업 위에서도 눌리게 */
+.home-indicator { z-index: 90; }
