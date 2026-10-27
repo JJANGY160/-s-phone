@@ -911,3 +911,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 홈 막대는 댓글 창·팝업 위에서도 눌리게 */
 .home-indicator { z-index: 90; }
+
+/* 사진 불러오는 중에는 자리 표시(줄무늬·설명) 숨김 → 파일이 없을 때만 표시 */
+.ph { background: #e9e9ee; }
+.ph.dark { background: #1f2024; }
+.ph::after { content: none; }
+.ph.ph-empty { background: repeating-linear-gradient(45deg, #d6d6db 0 8px, #cfcfd5 8px 16px); }
+.ph.dark.ph-empty { background: repeating-linear-gradient(45deg, #2c2c2e 0 8px, #262628 8px 16px); }
+.ph.ph-empty::after { content: attr(data-label); }
+.ph.round.ph-empty::after { content: none; }
+.ph img, .ph video { opacity: 0; transition: opacity .25s; }
+.ph img.ok, .ph video.ok { opacity: 1; }
+/* 배경화면·지도 핀·카톡 기본 프사는 기존 모양 유지 */
+.wall.ph, .bg.ph, .lock .wall, .home .wall { background: transparent !important; }
+.wall.ph::after, .bg.ph::after { content: none !important; }
+.ph.kdef { background: #a9c1d6; }
+.mw-pin .ph { background: #4c8bf5; }
+.mw-pin.es .ph { background: #8e6be8; }
+.mw-pin .ph.ph-empty::after { content: attr(data-label); display: block; color: #fff; font-size: 11px; font-weight: 800; }
+.mw-pin .ph.ph-empty { background: #4c8bf5; }
+.mw-pin.es .ph.ph-empty { background: #8e6be8; }
