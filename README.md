@@ -98,7 +98,8 @@ images/...        사진
 확장자(`.jpg` / `.png` / `.gif`)까지 똑같아야 해요. 다르면 data.js 경로도 같이 바꿔 주세요.
 
 ### 배경화면 (`images/wallpaper/`)
-`lock.jpg` 잠금화면 · `home.jpg` 홈 화면 (세로 사진 권장)
+`home.JPG` 하나를 잠금화면·홈 화면에 같이 써요 (세로 사진 권장)
+⚠️ 대소문자까지 data.js와 똑같아야 해요. `home.JPG` ≠ `home.jpg`
 
 ### 앱 아이콘 (`images/icons/`, 선택)
 `everytime.png` `instagram.png` `youtube.png` `fotmob.png` `camera.png` `calendar.png` `memo.png` `clock.png` `petcam.png` `map.png` `spotify.png` `aiask.png` `phone.png` `messages.png` `kakaotalk.png` `chrome.png`
@@ -129,9 +130,8 @@ images/...        사진
 |---|---|
 | `story-1-aburasoba.jpg` | 희수 스토리 ① 아부라소바 (양파 종지 걸린 컷) |
 | `story-2-cocktail.jpg` | 희수 스토리 ② 칵테일바 셀카 (옆자리 잔이 잘린 컷) |
-| `heesu-grid-1.jpg` ~ `heesu-grid-9.jpg` | 희수 피드 9개 |
 | `story-me.jpg` | 성찬 내 스토리 |
-| `me-grid-1.jpg` ~ `me-grid-9.jpg` | 성찬 피드 9개 |
+| `me-grid-1.jpg` ~ `me-grid-9.jpg` | 성찬 피드 9개 (1번이 최신). 누르면 게시물 화면, 캡션·숫자는 data.js `INSTAGRAM.me.feed` |
 | `story-sohee.jpg` | 소희 스토리 |
 | `alive-avatar.png` | 얼라이브 계정 프로필 |
 | `alive-post.jpg` | 10화: 성찬·은석 투샷 ("여자라면 영원대") |
