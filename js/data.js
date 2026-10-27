@@ -472,7 +472,7 @@ const PETCAM = {
     ]},
     { date: '2026-04-04', items: [
       // 타로가 23:02에 '실시간' 사진을 올린 뒤 → 은석이 성찬 집으로 달려와 캠을 쳐다봄 (파일 이름은 그대로)
-      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.jpg', label: '캠을 빤히 쳐다보는 은석' },
+      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.gif', label: '캠을 빤히 쳐다보는 은석' },
       { cam: 'bedroom', time: '21:40', tag: '사람 감지', img: 'images/petcam/clip-0404-2140.jpg', label: '침대 위 뒷모습', blur: true, star: true },
       { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.gif', label: '은석 품에 뛰어드는 겨울이' }
     ]},
