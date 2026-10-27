@@ -15,8 +15,13 @@
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // 이미지 자리: 파일이 있으면 이미지, 없으면 회색 자리 + 설명
-  const ph = (src, label = '', cls = '') =>
-    `<div class="ph ${cls}" data-label="${esc(label)}"><img src="${esc(src)}" alt="" onerror="this.remove()"></div>`;
+  // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
+  const ph = (src, label = '', cls = '') => {
+    const media = /\.(mp4|webm)$/i.test(src || '')
+      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="this.remove()"></video>`
+      : `<img src="${esc(src)}" alt="" onerror="this.remove()">`;
+    return `<div class="ph ${cls}" data-label="${esc(label)}">${media}</div>`;
+  };
   const P = (o) => esc(JSON.stringify(o || {}));
 
   let toastTimer;
@@ -569,6 +574,38 @@
     return `<div class="ig-tabs"><span data-tab="instagram">⌂</span><span data-tab="igSearch">⌕</span><span data-toast="새 게시물">⊕</span><span data-toast="릴스">▶</span><span class="me" data-tab="igMe">${ph(IG.me.avatar, '', 'round')}</span></div>`;
   }
   const ring = (src, seen, extra = '') => `<div class="ring ${seen ? 'seen' : ''}" ${extra}><div class="in">${ph(src, '', 'round')}</div></div>`;
+  /* --- 인스타 댓글: 독자가 직접 다는 댓글 (이 브라우저에만 저장돼요) --- */
+  const READER_ID_LIST = (typeof READER_IDS !== 'undefined' && READER_IDS.length) ? READER_IDS
+    : ['ilovegay', 'zltmgo', 'rubyeontae', 'insomnia', 'icantsleep', 'yourbyeontae', 'aburasoba', 'mandu', 'byeontae', 'bigbunny', 'rockndeer', 'imbyeontae'];
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('scphone.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('scphone.' + k, JSON.stringify(v)); } catch (e) { /* 저장 불가 환경 */ } }
+  };
+  const mention = (t) => esc(t).replace(/(^|\s)(@[\w._]+)/g, '$1<span class="mention">$2</span>');
+  function igCommentsHtml(f, fi) {
+    const base = f.comments || [];
+    const mine = store.get('igc.' + fi, null) || memComments[fi] || [];
+    const total = base.reduce((n, c) => n + 1 + (c.replies ? c.replies.length : 0), 0) + mine.length;
+    if (!total) return '';
+    const row = (c, reply) => `<div class="tx ig-cmt ${reply ? 'reply' : ''} ${c.reader ? 'mine' : ''}"><b>${esc(c.id)}</b> ${mention(c.text)}${c.reader ? ' <small>방금</small>' : ''}</div>`;
+    return `<div class="tx"><small>댓글 ${total}개 모두 보기</small></div>
+      ${base.map((c) => row(c) + (c.replies || []).map((r) => row(r, true)).join('')).join('')}
+      ${mine.map((c) => row(c)).join('')}`;
+  }
+  function addReaderComment(fi, text) {
+    text = text.trim();
+    if (!text) return;
+    const n = store.get('igc.n', 0);
+    const list = store.get('igc.' + fi, []);
+    list.push({ id: READER_ID_LIST[n % READER_ID_LIST.length], text, reader: true });
+    store.set('igc.' + fi, list);
+    store.set('igc.n', n + 1);
+    // 저장이 막힌 환경에서도 이번 화면에선 보이게
+    if (store.get('igc.' + fi, null) === null) memComments[fi] = list;
+    const box = document.getElementById('igc-' + fi);
+    if (box) box.innerHTML = igCommentsHtml(IG.feed[fi], fi);
+  }
+  const memComments = {};
   S.instagram = () => ({
     status: 'normal', ui: 'dark',
     html: `<div class="scr ig">
@@ -577,15 +614,19 @@
         <div class="story" data-go="igStory" data-p="${P({ u: 'me', i: 0 })}">${ring(IG.me.avatar, true)}<span>내 스토리</span></div>
         ${IG.storyBar.map((s) => { const has = s.id === IG.heesu.id || (IG.otherStories && IG.otherStories[s.id]); return `<div class="story" ${has ? `data-go="igStory" data-p="${P({ u: s.id, i: 0 })}"` : `data-toast="${esc(s.id)}"`}>${ring(s.avatar, s.seen)}<span>${esc(s.id)}</span></div>`; }).join('')}
       </div>
-      ${IG.feed.map((f) => `<div class="ig-post">
+      ${IG.feed.map((f, fi) => `<div class="ig-post">
         <div class="hd">${ph(f.avatar, '', 'round')}${esc(f.user)}</div>
         ${ph(f.img, f.label, 'pic')}
-        <div class="acts"><span>♡</span><span>💬</span><span>➤</span></div>
+        <div class="acts"><span>♡</span><span data-act="igFocus" data-i="${fi}">💬</span><span>➤</span></div>
         <div class="tx"><b>좋아요 ${esc(f.likes)}개</b></div>
         <div class="tx"><b>${esc(f.user)}</b> ${esc(f.caption)}</div>
-        ${f.comments && f.comments.length ? `<div class="tx"><small>댓글 ${f.comments.length}개 모두 보기</small></div>
-        ${f.comments.map((c) => `<div class="tx ig-cmt"><b>${esc(c.id)}</b> ${esc(c.text)}</div>`).join('')}` : ''}
+        <div id="igc-${fi}">${igCommentsHtml(f, fi)}</div>
         <div class="tx"><small>${esc(f.time)}</small></div>
+        <form class="ig-add" data-post="${fi}">
+          ${ph(IG.me.avatar, '', 'round')}
+          <input type="text" maxlength="150" placeholder="댓글 달기..." autocomplete="off" spellcheck="false">
+          <button type="submit">게시</button>
+        </form>
       </div>`).join('')}
       <div class="pad-bottom" style="height:20px"></div>
       ${igTabs()}
@@ -960,6 +1001,8 @@
     const el = screenEl.firstElementChild;
     if (!animate) el.classList.add('no-anim');
     if (out.after) out.after(el);
+    // 영상 자동 재생 (핸드폰 브라우저용)
+    el.querySelectorAll('video').forEach((v) => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
   }
   function go(name, params = {}) {
     state.stack.push({ name, params });
@@ -1011,6 +1054,7 @@
     switch (a) {
       case 'cancelPass': state.stack = [{ name: 'lock', params: {} }]; render(false); break;
       case 'storyNext': storyStep(1); break;
+      case 'igFocus': { const i = document.querySelector(`.ig-add[data-post="${el.dataset.i}"] input`); if (i) i.focus(); break; }
       case 'storyPrev': storyStep(-1); break;
       case 'alarm': {
         const al = ALARMS[+el.dataset.i]; al.on = !al.on;
@@ -1024,6 +1068,14 @@
       case 'blurPlay': toast('🙈 이 영상은 성찬만 볼 수 있어요'); break;
     }
   }
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('.ig-add');
+    if (!f) return;
+    e.preventDefault();
+    const inp = f.querySelector('input');
+    addReaderComment(+f.dataset.post, inp.value);
+    inp.value = '';
+  });
   $('#homeIndicator').addEventListener('click', () => { if (state.unlocked) goHome(false); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') back();
