@@ -915,3 +915,62 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 안전장치: 잠깐 쓰였던 예전 app.js가 캐시돼 있어도 사진 자리가 늘어나지 않게 (모양은 그대로) */
 .ph.empty, .ph.ph-empty { padding: 0; }
+
+/* =========================================================
+   7차 수정
+   ========================================================= */
+/* 상태바 음악: 글자 칸 자체는 고정, 안쪽 글자만 흐르게 (아이콘과 겹침 방지) */
+.sb-music .mq { animation: none !important; display: block; flex: 1; }
+.sb-music .mq span { animation: marquee 9s linear infinite; padding-right: 12px; }
+.sb-music { max-width: 120px; }
+
+/* 기본 프사 (카톡·인스타) */
+.ph.kdef, .ph.igdef { background: transparent; }
+.ph.kdef::after, .ph.igdef::after { display: none; content: none; }
+.ph.kdef svg, .ph.igdef svg { width: 100%; height: 100%; display: block; }
+
+/* 에타 광고 이미지 */
+.et-ad-img { position: relative; margin: 12px 18px; border-radius: 12px; overflow: hidden; height: 92px; }
+.et-ad-img .ph { width: 100%; height: 100%; }
+.et-ad-img small { position: absolute; top: 6px; right: 8px; z-index: 3; background: rgba(0,0,0,.35); color: #fff; font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; }
+
+/* 스포티파이 플레이리스트 */
+.spl { background: linear-gradient(#2a2a2a 0, #121212 360px); color: #fff; }
+.spl svg { width: 100%; height: 100%; display: block; }
+.spl-top { display: flex; justify-content: space-between; padding: 54px 16px 0; }
+.spl-top .circ { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.35); display: grid; place-items: center; padding: 11px; color: #fff; }
+.spl-cover { width: 120px; height: 120px; margin: -14px auto 0; border-radius: 6px; background: linear-gradient(135deg, #3d3d3d, #252525); display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.spl-cover span { width: 46px; height: 46px; color: #8c8c8c; }
+.spl h1 { font-size: 24px; font-weight: 800; padding: 22px 18px 8px; }
+.spl-owner { display: flex; align-items: center; gap: 4px; padding: 0 18px; }
+.spl-owner .plus { width: 26px; height: 26px; border-radius: 50%; background: #333; display: grid; place-items: center; font-size: 15px; z-index: 2; }
+.spl-owner .ph { width: 26px; height: 26px; margin-left: -8px; }
+.spl-owner b { font-size: 13.5px; margin-left: 6px; }
+.spl-meta { display: flex; align-items: center; gap: 6px; padding: 10px 18px 0; color: #b3b3b3; font-size: 13px; }
+.spl-meta svg { width: 15px; height: 15px; }
+.spl-act { display: flex; align-items: center; padding: 10px 18px 0; gap: 18px; }
+.spl-act .sh { width: 24px; height: 24px; color: #b3b3b3; }
+.spl-act .shuf { width: 26px; height: 26px; color: #b3b3b3; margin-left: auto; }
+.spl-act .play { width: 56px; height: 56px; border-radius: 50%; background: #1ed760; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.spl-act .play i, .spl-mini .pz i { display: block; width: 5px; height: 19px; background: #000; border-radius: 1.5px; }
+.spl-chips { display: flex; gap: 8px; overflow-x: auto; padding: 16px 18px 6px; scrollbar-width: none; }
+.spl-chips span { flex: none; background: #2a2a2a; border-radius: 18px; padding: 8px 14px; font-size: 13px; font-weight: 700; }
+.spl-list { padding: 6px 0; }
+.spl-song { display: flex; align-items: center; padding: 13px 18px; }
+.spl-song .t { flex: 1; font-size: 15.5px; display: flex; align-items: center; gap: 8px; }
+.spl-song .m { color: #b3b3b3; font-size: 18px; }
+.spl-song.on .t { color: #1ed760; font-weight: 600; }
+.sp-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 13px; }
+.sp-eq i { width: 3px; background: #1ed760; border-radius: 1px; animation: eq .9s ease-in-out infinite; }
+.sp-eq i:nth-child(2) { animation-delay: .2s; } .sp-eq i:nth-child(3) { animation-delay: .4s; }
+@keyframes eq { 0%,100% { height: 4px; } 50% { height: 13px; } }
+.spl-mini { position: absolute; left: 8px; right: 8px; bottom: 30px; z-index: 20; background: #2b2b2b; border-radius: 10px; padding: 9px 12px; display: flex; align-items: center; gap: 14px; }
+.spl-mini .mt { flex: 1; min-width: 0; }
+.spl-mini .mt b { font-size: 13.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spl-mini .bar { display: block; height: 2px; background: #555; margin-top: 7px; border-radius: 1px; overflow: hidden; }
+.spl-mini .bar i { display: block; height: 100%; width: 38%; background: #fff; }
+.spl-mini .dev { width: 22px; height: 22px; color: #fff; }
+.spl-mini .ok { width: 22px; height: 22px; border-radius: 50%; background: #1ed760; color: #000; display: grid; place-items: center; font-size: 13px; font-weight: 900; }
+.spl-mini .pz { display: flex; gap: 4px; }
+.spl-mini .pz i { background: #fff; height: 16px; width: 4px; }
+.spl-mini { position: sticky; left: auto; right: auto; bottom: 30px; margin: 10px 8px 30px; }
