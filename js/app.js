@@ -46,10 +46,13 @@ window.addEventListener('error', (e) => {
   // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
   const ph = (src, label = '', cls = '') => {
     if (src === 'default') return `<div class="ph igdef ${cls}">${IGDEF}</div>`;
-    const media = /\.(mp4|webm)$/i.test(src || '')
-      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="this.remove()"></video>`
-      : `<img src="${esc(src)}" alt="" onerror="this.remove()">`;
-    return `<div class="ph ${cls}" data-label="${esc(label)}">${media}</div>`;
+    if (!src) return `<div class="ph ${cls}" data-label="${esc(label)}"></div>`;
+    // 사진을 불러오는 동안(ld)엔 임시 제목을 숨기고, 파일이 없을 때만 제목이 보여요
+    const fail = `this.parentNode&&this.parentNode.classList.remove('ld');this.remove()`;
+    const media = /\.(mp4|webm)$/i.test(src)
+      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="${fail}"></video>`
+      : `<img src="${esc(src)}" alt="" onerror="${fail}">`;
+    return `<div class="ph ld ${cls}" data-label="${esc(label)}">${media}</div>`;
   };
   const P = (o) => esc(JSON.stringify(o || {}));
   // 카카오톡 기본 프사 ('default') 또는 사진
@@ -980,17 +983,12 @@ window.addEventListener('error', (e) => {
   const meLiked = {};
   S.igMePost = ({ i }) => {
     const me = IG.me;
-    const f = (me.feed && me.feed[i]) || {};
-    const n = num(f.likes) + (meLiked[i] ? 1 : 0);
-    return {
-      status: 'normal', ui: 'dark',
-      html: `<div class="scr ig">
-        <div class="ig-prof-head"><button class="bk" data-back>${IC.back}</button><span class="ttl2">게시물</span><span class="hd-ic"></span></div>
-        <div class="ig-post">
+    const list = me.feed || [];
+    const post = (f, k) => `<div class="ig-post" id="mp-${k}">
           <div class="hd">${ph(me.avatar, '', 'round')}<b>${esc(me.id)}</b><span class="more">${IC.more}</span></div>
-          <div class="pic-wrap">${ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`, 'pic')}</div>
+          <div class="pic-wrap">${ph(`images/instagram/me-grid-${k + 1}.jpg`, `게시물 ${k + 1}`, 'pic')}</div>
           <div class="bar">
-            <span class="b ${meLiked[i] ? 'liked' : ''}" data-act="igMeLike" data-i="${i}">${IC.heart}<em>${fmt(n)}</em></span>
+            <span class="b ${meLiked[k] ? 'liked' : ''}" data-act="igMeLike" data-i="${k}">${IC.heart}<em>${fmt(num(f.likes) + (meLiked[k] ? 1 : 0))}</em></span>
             <span class="b">${IC.comment}<em>${esc(f.comments ?? 0)}</em></span>
             <span class="b">${IC.repost}<em>${esc(f.reposts ?? 0)}</em></span>
             <span class="b">${IC.send}<em>${esc(f.shares ?? 0)}</em></span>
@@ -999,9 +997,19 @@ window.addEventListener('error', (e) => {
           <div class="tx"><b>${esc(me.id)}</b> ${esc(f.caption || '')}</div>
           ${f.comments ? `<div class="tx more-c">댓글 ${esc(f.comments)}개 모두 보기</div>` : ''}
           <div class="tx when">${esc(f.time || '')}</div>
-        </div>
+        </div>`;
+    return {
+      status: 'normal', ui: 'dark',
+      html: `<div class="scr ig ig-mefeed">
+        <div class="ig-prof-head mf-head"><button class="bk" data-back>${IC.back}</button><span class="ttl2">게시물</span><span class="hd-ic"></span></div>
+        ${list.map(post).join('')}
         <div class="pad-bottom"></div>
-      </div>`
+      </div>`,
+      after(el) {
+        const t = el.querySelector(`#mp-${i}`);
+        const head = el.querySelector('.mf-head');
+        if (t && i > 0) el.scrollTop = t.offsetTop - (head ? head.offsetHeight : 0);
+      }
     };
   };
   S.igProfile = () => {

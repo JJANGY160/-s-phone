@@ -388,9 +388,11 @@ const EVERYTIME = {
 
 /* ---------------- 인스타그램 ---------------- */
 const INSTAGRAM = {
-  me: { id: 'jeong.sc', name: '정성찬', avatar: 'images/profile/seongchan.jpg', posts: 23, followers: '2,184', following: 301, bio: '🏀⚽ 체육교육\n겨울이 아빠 🐶', grid: 9,
+  me: { id: 'jeong.sc', name: '정성찬', avatar: 'images/profile/seongchan.jpg', posts: 9, followers: '2,184', following: 301, bio: '🏀⚽ 체육교육\n겨울이 아빠 🐶', grid: 9,
     // 내 스토리 (회색 테두리 = 이미 올린 것)
-    stories: [{ img: 'images/instagram/story-me.jpg', label: '성찬 스토리 사진', caption: '', ago: '15시간' }],
+    // 희수 '아부라소바' 스토리(7시간 전, 6/2 저녁 7시쯤)를 보고, 상황을 제대로 모른 채 괴로워하며 올린 밈.
+    // 은영 누나랑 저녁 먹고 답장(8:40)한 뒤, 은석한테 카톡 폭탄(0:21~) 보내기 전 → 6/2 밤 10시대 = 3시간 전
+    stories: [{ img: 'images/instagram/story-me.jpg', label: '괴로워하는 밈 사진', caption: '', ago: '3시간' }],
     // 내 피드 게시물 (위에서부터 1번 = 최신). 사진은 images/instagram/me-grid-1.jpg ~ me-grid-9.jpg
     // 팔로워 2,184명 기준: 좋아요 200~400대, 은석이 나온 사진은 조금 더 많게
     feed: [
@@ -399,10 +401,10 @@ const INSTAGRAM = {
       { caption: '⚽', likes: '236', comments: 8, reposts: 0, shares: 5, time: '5월 17일' },
       { caption: '대학생을석방하라석방하라', likes: '344', comments: 27, reposts: 3, shares: 22, time: '4월 22일' },
       { caption: '셤기간이면 출몰하는 미디관 송둥어', likes: '421', comments: 38, reposts: 4, shares: 31, time: '4월 17일' },
-      { caption: '낚시노잼이라며ㅡㅡ', likes: '273', comments: 19, reposts: 1, shares: 8, time: '3월 8일' },
+      { caption: '낚시노잼이라며ㅡㅡ', likes: '273', comments: 19, reposts: 1, shares: 8, time: '3월 1일' },
       { caption: '너네는강아지랑제주도여행가지마라', likes: '356', comments: 24, reposts: 2, shares: 17, time: '2월 11일' },
       { caption: '내폰으로 뭐하나했더니', likes: '398', comments: 33, reposts: 3, shares: 26, time: '1월 19일' },
-      { caption: '영원대 축제 놀러오세요오 🔥🔥', likes: '462', comments: 41, reposts: 9, shares: 58, time: '2025년 5월 14일' }
+      { caption: '영원대 축제 놀러오세요오 🔥🔥', likes: '462', comments: 41, reposts: 9, shares: 58, time: '2025년 5월 12일' }
     ] },
   recentSearch: [
     { id: 'heesu.k', name: '김희수', avatar: 'default' },
@@ -482,7 +484,7 @@ const PETCAM = {
     ]},
     // 성찬 혼자 찍힌 날 ① 5/10 저녁 (앨범 '겨울이 터그놀이' 사진과 같은 날)
     { date: '2026-05-10', items: [
-      { cam: 'living', time: '20:38', tag: '움직임 감지', img: 'images/petcam/clip-0510-2038.gif', label: '거실에서 겨울이랑 터그놀이 하는 성찬' }
+      { cam: 'bedroom', time: '20:38', tag: '움직임 감지', img: 'images/petcam/clip-0510-2038.gif', label: '침실에서 겨울이랑 터그놀이 하는 성찬' }
     ]},
     // 성찬 혼자 찍힌 날 ② 4/19 새벽 (미윤 '잘 지내?' 카톡 온 다음 날 새벽, 은석과 서먹하던 때)
     { date: '2026-04-19', items: [
