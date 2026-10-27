@@ -30,8 +30,9 @@ const CONFIG = {
     songs: ['너에게 닿기를', '별 보러 갈래?', '그럴때마다', '묘해, 너와', '오늘 뭐 했는지 말해봐'],
     playing: 4
   },
-  lockWallpaper: 'images/wallpaper/lock.jpg',
-  homeWallpaper: 'images/wallpaper/home.jpg',
+  // 깃허브는 대소문자를 구분해요: 올린 파일 이름이 home.JPG(대문자)라서 그대로 맞췄어요
+  lockWallpaper: 'images/wallpaper/home.JPG',
+  homeWallpaper: 'images/wallpaper/home.JPG',
   myAvatar: 'images/profile/seongchan.jpg'
 };
 
@@ -203,7 +204,7 @@ const KAKAO = {
         { date: '2026-05-13' },
         { from: '은영 누나', text: '축제 둘째날 부스 사진 올립니다', t: '오후 9:30' },
         { from: '은영 누나', type: 'photo', src: 'images/kakao/alive-festival.jpg', label: '축제 부스에서 웃고 있는 성찬', t: '오후 9:30' },
-        { from: '홍동기획 강성하', text: '부스사진이 아니라 걍 성찬사진인데', t: '오후 9:31' } 
+        { from: '홍동기획 강성하', text: '부스사진이 아니라 걍 성찬사진인데', t: '오후 9:31' },
         { from: '홍동 손연주', text: '아니근데 성찬선배 오픈런 실화예요?', t: '오후 9:32' },
         { from: 'me', text: '이게 나야아ㅏ', t: '오후 9:40' },
         { date: '2026-06-02' },
@@ -389,7 +390,20 @@ const EVERYTIME = {
 const INSTAGRAM = {
   me: { id: 'jeong.sc', name: '정성찬', avatar: 'images/profile/seongchan.jpg', posts: 23, followers: '2,184', following: 301, bio: '🏀⚽ 체육교육\n겨울이 아빠 🐶', grid: 9,
     // 내 스토리 (회색 테두리 = 이미 올린 것)
-    stories: [{ img: 'images/instagram/story-me.jpg', label: '성찬 스토리 사진', caption: '', ago: '15시간' }] },
+    stories: [{ img: 'images/instagram/story-me.jpg', label: '성찬 스토리 사진', caption: '', ago: '15시간' }],
+    // 내 피드 게시물 (위에서부터 1번 = 최신). 사진은 images/instagram/me-grid-1.jpg ~ me-grid-9.jpg
+    // 팔로워 2,184명 기준: 좋아요 200~400대, 은석이 나온 사진은 조금 더 많게
+    feed: [
+      { caption: '머리하러 왔다아 >< ', likes: '318', comments: 21, reposts: 2, shares: 14, time: '5월 30일' },
+      { caption: '간식들고있는거아님', likes: '287', comments: 16, reposts: 1, shares: 9, time: '5월 23일' },
+      { caption: '⚽', likes: '236', comments: 8, reposts: 0, shares: 5, time: '5월 17일' },
+      { caption: '대학생을석방하라석방하라', likes: '344', comments: 27, reposts: 3, shares: 22, time: '4월 22일' },
+      { caption: '셤기간이면 출몰하는 미디관 송둥어', likes: '421', comments: 38, reposts: 4, shares: 31, time: '4월 17일' },
+      { caption: '낚시노잼이라며ㅡㅡ', likes: '273', comments: 19, reposts: 1, shares: 8, time: '3월 8일' },
+      { caption: '너네는강아지랑제주도여행가지마라', likes: '356', comments: 24, reposts: 2, shares: 17, time: '2월 11일' },
+      { caption: '내폰으로 뭐하나했더니', likes: '398', comments: 33, reposts: 3, shares: 26, time: '1월 19일' },
+      { caption: '영원대 축제 놀러오세요오 🔥🔥', likes: '462', comments: 41, reposts: 9, shares: 58, time: '2025년 5월 14일' }
+    ] },
   recentSearch: [
     { id: 'heesu.k', name: '김희수', avatar: 'default' },
     { id: 'alive.youngwon', name: '영원대 홍보대사 얼라이브', avatar: 'images/instagram/alive-avatar.png' }

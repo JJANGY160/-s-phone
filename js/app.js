@@ -951,7 +951,7 @@ window.addEventListener('error', (e) => {
     html: `<div class="scr ig ig-search">
       <div class="box">${IC.search}<span class="typed">김</span></div>
       <h5>최근 검색 항목 <small>모두 보기</small></h5>
-      ${IG.recentSearch.map((u) => `<div class="ig-user" ${u.id === IG.heesu.id ? `data-go="igProfile"` : `data-toast="${esc(u.id)}"`}>${ph(u.avatar, '', 'round')}<div><b>${esc(u.id)}</b><small>${esc(u.name)}</small></div><span class="x">${IC.close}</span></div>`).join('')}
+      ${IG.recentSearch.map((u) => `<div class="ig-user" ${u.id === IG.heesu.id ? `data-go="igDm"` : `data-toast="${esc(u.id)}"`}>${ph(u.avatar, '', 'round')}<div><b>${esc(u.id)}</b><small>${esc(u.name)}</small></div><span class="x">${IC.close}</span></div>`).join('')}
       <div class="pad-bottom" style="height:380px"></div>
       ${igTabs('igSearch')}
     </div>`
@@ -970,9 +970,37 @@ window.addEventListener('error', (e) => {
           <div class="bio">${esc(me.bio)}</div>
           <div class="btns"><button>프로필 편집</button><button>프로필 공유</button></div>
         </div>
-        <div class="ig-grid">${Array.from({ length: me.grid || 9 }, (_, i) => ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`)).join('')}</div>
+        <div class="ig-grid">${Array.from({ length: (me.feed && me.feed.length) || me.grid || 9 }, (_, i) => `<div data-go="igMePost" data-p="${P({ i })}">${ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`)}</div>`).join('')}</div>
         <div class="pad-bottom" style="height:20px"></div>
         ${igTabs('igMe')}
+      </div>`
+    };
+  };
+  // 성찬 피드 게시물 하나 (홈 피드의 얼라이브 게시물과 같은 디자인)
+  const meLiked = {};
+  S.igMePost = ({ i }) => {
+    const me = IG.me;
+    const f = (me.feed && me.feed[i]) || {};
+    const n = num(f.likes) + (meLiked[i] ? 1 : 0);
+    return {
+      status: 'normal', ui: 'dark',
+      html: `<div class="scr ig">
+        <div class="ig-prof-head"><button class="bk" data-back>${IC.back}</button><span class="ttl2">게시물</span><span class="hd-ic"></span></div>
+        <div class="ig-post">
+          <div class="hd">${ph(me.avatar, '', 'round')}<b>${esc(me.id)}</b><span class="more">${IC.more}</span></div>
+          <div class="pic-wrap">${ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`, 'pic')}</div>
+          <div class="bar">
+            <span class="b ${meLiked[i] ? 'liked' : ''}" data-act="igMeLike" data-i="${i}">${IC.heart}<em>${fmt(n)}</em></span>
+            <span class="b">${IC.comment}<em>${esc(f.comments ?? 0)}</em></span>
+            <span class="b">${IC.repost}<em>${esc(f.reposts ?? 0)}</em></span>
+            <span class="b">${IC.send}<em>${esc(f.shares ?? 0)}</em></span>
+            <span class="b save">${IC.bookmark}</span>
+          </div>
+          <div class="tx"><b>${esc(me.id)}</b> ${esc(f.caption || '')}</div>
+          ${f.comments ? `<div class="tx more-c">댓글 ${esc(f.comments)}개 모두 보기</div>` : ''}
+          <div class="tx when">${esc(f.time || '')}</div>
+        </div>
+        <div class="pad-bottom"></div>
       </div>`
     };
   };
@@ -1010,7 +1038,7 @@ window.addEventListener('error', (e) => {
       html: `<div class="scr story-view zoom-in">
         <div class="media">${ph(s.img, s.label, 'dark')}</div>
         <div class="bars">${h.stories.map((_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>
-        <div class="who">${ph(h.avatar, '', 'round')}${esc(h.id)} <small>${esc(s.ago)}</small><span class="x" data-back>${IC.close}</span></div>
+        <div class="who"><span class="who-me" ${u === 'me' ? 'data-go="igMe"' : ''}>${ph(h.avatar, '', 'round')}${esc(h.id)}</span> <small>${esc(s.ago)}</small><span class="x" data-back>${IC.close}</span></div>
         ${s.caption ? `<div class="cap">${esc(s.caption)}</div>` : ''}
         <div class="tapzone"><div data-act="storyPrev"></div><div data-act="storyNext"></div></div>
         <div class="reply"><div ${h.id === IG.heesu.id ? 'data-go="igDm"' : ''}>메시지 보내기</div><span>${IC.heart}</span><span>${IC.send}</span></div>
@@ -1040,7 +1068,7 @@ window.addEventListener('error', (e) => {
       status: 'normal', ui: 'dark',
       html: `<div class="scr dm">
         <div class="dm-head"><button class="bk" data-back>${IC.back}</button>${ph(h.avatar, '', 'round')}<div><b>${esc(h.name)}</b><small>${esc(h.id)}</small></div></div>
-        <div class="dm-body">${ph(h.avatar, '', 'round')}<b>${esc(h.name)}</b><small>${esc(h.id)} · Instagram</small><small>팔로워 ${h.followers}명 · 게시물 ${h.posts}개</small><button>프로필 보기</button></div>
+        <div class="dm-body">${ph(h.avatar, '', 'round')}<b>${esc(h.name)}</b><small>${esc(h.id)} · Instagram</small><small>팔로워 ${h.followers}명 · 게시물 ${h.posts}개</small></div>
         <div class="dm-input"><div><span class="cam">${IC.camera}</span><input class="tx-in" id="dmInput" type="text" value="${esc(state.dmText ?? '')}" ${state.typed ? '' : 'readonly'} autocomplete="off" spellcheck="false"><span class="send" aria-disabled="true">보내기</span></div></div>
       </div>`,
       after() {
@@ -1448,6 +1476,13 @@ window.addEventListener('error', (e) => {
         const bar = $('#pcbar'); bar.style.transition = 'width 6s linear'; requestAnimationFrame(() => (bar.style.width = '100%'));
         break;
       }
+      case 'igMeLike': {
+        const k = +el.dataset.i; meLiked[k] = !meLiked[k];
+        const f = (IG.me.feed || [])[k] || {};
+        el.classList.toggle('liked', meLiked[k]);
+        el.querySelector('em').textContent = fmt(num(f.likes) + (meLiked[k] ? 1 : 0));
+        break;
+      }
       case 'blurPlay': toast('이 영상은 성찬만 볼 수 있어요'); break;
     }
   }
@@ -1474,7 +1509,7 @@ window.addEventListener('error', (e) => {
   state.unlocked = true;
   if (location.hash === '#home') state.stack = [{ name: 'home', params: {} }];
   else if (location.hash === '#lock') { state.unlocked = false; state.stack = [{ name: 'lock', params: {} }]; }
-  else state.stack = [{ name: 'home', params: {} }, { name: 'igSearch', params: {} }, { name: 'igProfile', params: {} }, { name: 'igDm', params: {} }];
+  else state.stack = [{ name: 'home', params: {} }, { name: 'igSearch', params: {} }, { name: 'igDm', params: {} }];
   render(false);
   // 희수 DM에서 시작하면 타이핑이 끝난 뒤 배너가 시작돼요 (startTyping). 그 외에는 바로 시작.
   if (currentScreen().name !== 'igDm' && state.unlocked) { state.typed = true; startBanners(); }
