@@ -141,6 +141,14 @@ const KAKAO = {
         { from: 'me', text: '저녁ㄱ', t: '오후 5:51', read: true },
         { date: '2026-03-19' },
         { from: 'me', text: '1층', t: '오전 12:34', read: true },
+        { date: '2026-03-28' },
+        { from: 'me', type: 'photo', src: 'images/album/graduation.jpg', label: '고등학교 졸업식 때 찍은 둘 사진', t: '오후 8:12', read: true },
+        { from: 'me', text: '우리 졸업때찍은겈ㅋ', t: '오후 8:12', read: true },
+        { from: 'me', text: '엄마가보내줌', t: '오후 8:12', read: true },
+        { from: '은석이', text: '어무니 잘지내시지', t: '오후 8:20' },
+        { from: 'me', text: '몰라', t: '오후 8:21', read: true },
+        { from: '은석이', text: 'ㅋㅋㅋ뭘몰라 아까도 통화했잔슴', t: '오후 8:21' },
+        { from: 'me', text: 'ㅋㅋㅋㅋ', t: '오후 8:22', read: true },
         { date: '2026-04-05' },
         { from: 'me', text: '겨울이 밥 몇 끼 먹음?', t: '오후 6:40', read: true },
         { from: 'me', text: '똥은 몇 번 쌌어', t: '오후 6:40', read: true },
@@ -152,14 +160,6 @@ const KAKAO = {
         { from: 'me', text: '전화 받아라', t: '오후 7:03', read: true },
         { date: '2026-04-07' },
         { from: '은석이', text: '수업 끝나고 잠깐 보자', t: '오후 12:41' },
-        { date: '2026-05-03' },
-        { from: 'me', type: 'photo', src: 'images/album/graduation.jpg', label: '고등학교 졸업식 때 찍은 둘 사진', t: '오후 8:12', read: true },
-        { from: 'me', text: '우리 졸업때찍은겈ㅋ', t: '오후 8:12', read: true },
-        { from: 'me', text: '엄마가보내줌', t: '오후 8:12', read: true },
-        { from: '은석이', text: '어무니 잘지내시지', t: '오후 8:20' },
-        { from: 'me', text: '몰라', t: '오후 8:21', read: true },
-        { from: '은석이', text: 'ㅋㅋㅋ뭘몰라 아까도 통화했잔슴', t: '오후 8:21' },
-        { from: 'me', text: 'ㅋㅋㅋㅋ', t: '오후 8:22', read: true },
         { date: '2026-05-08' },
         { from: 'me', text: '11시에 얼라이브 해장 ㄱㄱ', t: '오전 9:12', read: true },
         { from: '은석이', text: '오늘 타로형이랑 약속 있음', t: '오전 10:58' },
@@ -428,7 +428,7 @@ const INSTAGRAM = {
     // 11화: 성찬이 밤새 들락거린 스토리 두 개
     stories: [
       { img: 'images/instagram/story-1-aburasoba.jpg', label: '아부라소바 사진 (양파 종지가 걸린 컷)', caption: '은석이 형이 사준 아부라소바', ago: '7시간' },
-      { img: 'images/instagram/story-2-cocktail.png', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
+      { img: 'images/instagram/story-2-cocktail.jpg', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
     ]
   },
   // 김희수 DM: 보내지 못한 채 입력창에 남은 문장
@@ -472,7 +472,7 @@ const PETCAM = {
     ]},
     { date: '2026-04-04', items: [
       // 타로가 23:02에 '실시간' 사진을 올린 뒤 → 은석이 성찬 집으로 달려와 캠을 쳐다봄 (파일 이름은 그대로)
-      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.gif', label: '캠을 빤히 쳐다보는 은석' },
+      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.jpg', label: '캠을 빤히 쳐다보는 은석' },
       { cam: 'bedroom', time: '21:40', tag: '사람 감지', img: 'images/petcam/clip-0404-2140.jpg', label: '침대 위 뒷모습', blur: true, star: true },
       { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.gif', label: '은석 품에 뛰어드는 겨울이' }
     ]},
@@ -521,7 +521,6 @@ const ALBUM = {
     { src: 'images/album/eunseok-0525.jpg', label: '자는 은석', date: '2026-05-25', time: '오전 5:12', place: '집', caption: '1교시 어떡하냐 얘' },
     { src: 'images/album/eunseok-0521.jpg', label: '자는 은석', date: '2026-05-21', time: '오전 3:40', place: '집', caption: '넥타이 그대로 잠듦ㅋㅋ' },
     { src: 'images/album/04.jpg', label: '은석 단복 (단톡에서 저장)', date: '2026-05-20', time: '오전 10:48' },
-    { src: 'images/album/graduation.jpg', label: '고등학교 졸업식 (엄마가 보내 준 사진)', date: '2026-05-03', time: '오후 8:11' },
     { src: 'images/album/eunseok-0515.jpg', label: '자는 은석', date: '2026-05-15', time: '오전 4:20', place: '집', caption: '축제 끝. 기절' },
     { src: 'images/album/05.jpg', label: '축제 부스', date: '2026-05-13', time: '오후 3:02', place: '영원대학교' },
     { src: 'images/album/06.jpg', label: '겨울이 터그놀이', date: '2026-05-10', time: '오후 8:41', place: '집' },
@@ -530,6 +529,7 @@ const ALBUM = {
     { src: 'images/album/eunseok-0408.jpg', label: '자는 은석', date: '2026-04-08', time: '오전 3:05', place: '집', caption: '또 내 베개 뺏음' },
     { src: 'images/album/09.jpg', label: '춘천 축구', date: '2026-04-05', time: '오전 10:27', place: '춘천' },
     { src: 'images/album/10.jpg', label: '엠티', date: '2026-04-03', time: '오후 10:14', place: '가평' },
+    { src: 'images/album/graduation.jpg', label: '고등학교 졸업식 (엄마가 보내 준 사진)', date: '2026-03-28', time: '오후 8:11' },
     { src: 'images/album/11.jpg', label: '겨울이 산책', date: '2026-03-28', time: '오후 5:50', place: '집' },
     { src: 'images/album/12.jpg', label: '겨울이 아기 때', date: '2024-11-02', time: '오후 2:16', place: '집' }
   ],
