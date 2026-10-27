@@ -38,7 +38,6 @@ const HOME_APPS = [
   { id: 'fotmob', label: 'FotMob', icon: 'images/icons/fotmob.png', color: '#0f1a24', glyph: '⚽' },
   { id: 'camera', label: '카메라', icon: 'images/icons/camera.png', color: 'linear-gradient(#d9d9de,#a5a5ab)', glyph: '◉' },
   { id: 'calendar', label: '캘린더', icon: 'images/icons/calendar.png', color: '#fff', glyph: 'cal' },
-  { id: 'album', label: '사진', icon: 'images/icons/photos.png', color: '#fff', glyph: '❀', glyphColor: '#f3a02a' },
   { id: 'memo', label: '메모', icon: 'images/icons/memo.png', color: 'linear-gradient(#ffd84d 0 22%,#fff 22%)', glyph: '' },
   { id: 'clock', label: '시계', icon: 'images/icons/clock.png', color: '#111', glyph: 'clock' },
   { id: 'petcam', label: '펫캠', icon: 'images/icons/petcam.png', color: 'linear-gradient(135deg,#7cc6ff,#3d7bff)', glyph: '🐾' },
@@ -60,7 +59,10 @@ const LOCK_NOTIFS = [];
 /* ---------------- 홈 화면에서 순서대로 내려오는 배너 ---------------- */
 // 11화: 소희의 단톡 알림 → 은석의 답장. 마지막 배너를 누르면 단톡방이 열려요.
 // 링크를 열고 bannerDelay(ms) 뒤부터 차례로 내려와요
-const BANNER_TIMING = { firstDelay: 3000, gap: 1900 };
+// afterTyping: 희수 DM 입력이 다 써진 뒤 첫 배너까지 (ms)
+const BANNER_TIMING = { firstDelay: 3000, gap: 1900, afterTyping: 1200 };
+// 링크를 열면 DM 입력창에 글자가 한 글자씩 써져요 (startDelay: 시작 전 대기, speed: 한 글자당 ms)
+const DM_TYPING = { startDelay: 900, speed: 230 };
 const BANNERS = [
   { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '은석이형 아직도 체육관이에요??' },
   { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
@@ -74,23 +76,24 @@ const BANNERS = [
 const KAKAO = {
   ad: { brand: 'MAISON NOIR', title: 'NEW 누아르 오 드 퍼퓸', sub: '그 사람한테서 나던 그 향', img: 'images/kakao/ad.png' },
   // 친구 목록에 저장된 이름 → 프로필 이미지
+  // 'default' = 카카오톡 기본 프사 (사진을 넣고 싶으면 이미지 경로로 바꾸세요)
   avatars: {
-    '은석이': 'images/profile/eunseok.jpg',
+    '은석이': 'default',
     '미디 이소희': 'images/profile/sohee.jpg',
     '경제 타로형': 'images/profile/taro.jpg',
     '연영 박원빈': 'images/profile/wonbin.jpg',
-    '사회 강민석': 'images/profile/minseok.jpg',
-    '연영 이찬영': 'images/profile/chanyoung.jpg',
+    '사회 강민석': 'default',
+    '연영 이찬영': 'default',
     '연영 앤톤리': 'images/profile/anton.jpg',
-    '은영 누나': 'images/profile/eunyoung.jpg',
-    '홍동기획 강성하': 'images/profile/seongha.jpg',
-    '홍동 김희수': 'images/profile/heesu.jpg',
-    '홍동 손연주': 'images/profile/yeonju.jpg',
-    '홍동 이유은': 'images/profile/yueun.jpg',
-    '미윤': 'images/profile/miyun.jpg',
-    '지원 (홍대)': 'images/profile/jiwon.jpg',
-    '채린': 'images/profile/chaerin.jpg',
-    '체교 한도윤': 'images/profile/doyoon.jpg'
+    '은영 누나': 'default',
+    '홍동기획 강성하': 'default',
+    '홍동 김희수': 'default',
+    '홍동 손연주': 'default',
+    '홍동 이유은': 'default',
+    '미윤': 'default',
+    '지원 (홍대)': 'default',
+    '채린': 'default',
+    '체교 한도윤': 'default'
   },
   chats: [
     {
@@ -124,7 +127,7 @@ const KAKAO = {
       ]
     },
     {
-      id: 'eunseok', name: '은석이', avatar: 'images/profile/eunseok.jpg', unread: 0,
+      id: 'eunseok', name: '은석이', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-04-05' },
         { from: 'me', text: '겨울이 밥 몇 끼 먹음?', t: '오후 6:40', read: true },
@@ -169,7 +172,10 @@ const KAKAO = {
         { from: 'me', type: 'photo', src: 'images/kakao/winter-sleeping.jpg', label: '발치에서 자는 겨울이', t: '오전 12:23', read: false },
         { from: 'me', text: '겨울이가 너 보고 싶대', t: '오전 12:23', read: false },
         { from: 'me', text: '야 송은석', t: '오전 12:40', read: false },
-        { from: 'me', text: '긱사 들어감?', t: '오전 1:12', read: false }
+        { from: 'me', text: '긱사 들어감?', t: '오전 1:12', read: false },
+        { from: 'me', text: '야식 망빙 ㄱㄱ?', t: '오전 1:24', read: false },
+        { from: 'me', text: '야', t: '오전 1:36', read: false },
+        { from: 'me', text: '야야야', t: '오전 1:44', read: false }
       ]
     },
     {
@@ -192,7 +198,7 @@ const KAKAO = {
     },
     {
       // 미련 남은 전여친. 성찬이 읽고 답장 안 함(읽씹) → 안 읽은 숫자 없음
-      id: 'ex', name: '미윤', avatar: 'images/profile/miyun.jpg', unread: 0,
+      id: 'ex', name: '미윤', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-04-18' },
         { from: '미윤', text: '잘 지내?', t: '오후 11:58' },
@@ -208,7 +214,7 @@ const KAKAO = {
       ]
     },
     {
-      id: 'eunyoung', name: '은영 누나', avatar: 'images/profile/eunyoung.jpg', unread: 0,
+      id: 'eunyoung', name: '은영 누나', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-06-02' },
         { from: '은영 누나', text: '오늘 김치찌개 잘 먹었다~', t: '오후 8:15' },
@@ -234,7 +240,7 @@ const KAKAO = {
     },
     {
       // 원나잇 추정 ①
-      id: 'on1', name: '지원 (멉대)', avatar: 'images/profile/jiwon.jpg', unread: 0,
+      id: 'on1', name: '지원 (멉대)', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-03-15' },
         { from: '지원 (멉대)', text: '잘 들어갔어?ㅎㅎ', t: '오전 11:20' },
@@ -244,7 +250,7 @@ const KAKAO = {
     },
     {
       // 원나잇 추정 ②
-      id: 'on2', name: '채린', avatar: 'images/profile/chaerin.jpg', unread: 0,
+      id: 'on2', name: '채린', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-02-21' },
         { from: '채린', text: '번호 이거 맞지?', t: '오전 4:41' },
@@ -252,7 +258,7 @@ const KAKAO = {
       ]
     },
     {
-      id: 'doyoon', name: '체교 한도윤', avatar: 'images/profile/doyoon.jpg', unread: 0,
+      id: 'doyoon', name: '체교 한도윤', avatar: 'default', unread: 0,
       messages: [
         { date: '2026-05-25' },
         { from: '체교 한도윤', text: '형!! 오늘 과팅 장소랑 시간입니다', t: '오전 9:40' },
@@ -380,6 +386,9 @@ const INSTAGRAM = {
   },
   feed: [
     { user: 'alive.youngwon', avatar: 'images/instagram/alive-avatar.png', img: 'images/instagram/alive-post.jpg', label: '성찬과 은석 투샷 (10화)', likes: '1,027', caption: '여자라면 영원대 💙 #영원대 #얼라이브 #홍보대사', time: '1주 전',
+      // 사진 왼쪽 아래에 뜨는 '좋아요 누른 사람' 프사. likedByMe: 성찬이 이미 하트를 누른 상태
+      likers: [ { avatar: 'images/profile/seongchan.jpg' }, { avatar: 'images/profile/sohee.jpg' } ],
+      likedByMe: true,
       comments: [
         { id: 'seow_1', text: '영원대 가려고 방금 자퇴하고 옴' },
         { id: 'imnotgay', text: '내남자들 찾았다' },
@@ -583,3 +592,26 @@ const MAP_PINS = [
   { name: '남자 기숙사', note: '', x: 28, y: 30, color: '#8e8e93' },
   { name: '집', note: '겨울이네', x: 75, y: 72, color: '#ff375f' }
 ];
+
+/* ---------------- 홈 화면 지도 위젯 ---------------- */
+// 위치는 위젯 안에서의 % 좌표. 독자가 '할 일'을 하나씩 할 때마다 성찬이 집 → 중간 → 체육관으로 움직여요.
+const MAP_WIDGET = {
+  places: {
+    home: { x: 68, y: 64, label: '집' },
+    mid:  { x: 50, y: 62 },
+    gym:  { x: 24, y: 62, label: '영원대 체육관' }
+  },
+  seongchan: { name: '성찬', avatar: 'images/profile/seongchan.jpg' },
+  eunseok:   { name: '은석', avatar: 'images/profile/eunseok.jpg' }
+};
+
+/* ---------------- 할 일 4개를 모두 하면 뜨는 펫캠 알림 ---------------- */
+// 할 일: 희수 스토리 2개 보기 · 라이즈 단톡방 열기 · 은석 카톡방 열기 · 얼라이브 게시글에 댓글 달기
+const PETCAM_ALERT = {
+  cam: '거실',
+  title: '거실 캠',
+  text: '사람의 움직임이 감지되었어요',
+  media: 'images/petcam/alert-0603.gif',   // .mp4로 바꿔도 돼요
+  label: '현관으로 들어오는 두 사람',
+  delay: 1500                               // 4번째를 끝내고 알림이 뜰 때까지 (ms)
+};

@@ -2,6 +2,11 @@
    성찬의 iPhone — 화면 코드
    내용은 data.js에, 화면 그리는 방법은 이 파일에 있어요.
    ========================================================= */
+/* ★ 공유 댓글 주소 ★
+   구글 Apps Script로 만든 '웹 앱 URL'을 따옴표 안에 붙여 넣으세요.
+   비워 두면 댓글이 각 독자의 브라우저에만 저장돼요. (설정 방법: README.md '공유 댓글' 항목) */
+const COMMENTS_API_URL = '';
+
 (() => {
   'use strict';
 
@@ -23,6 +28,10 @@
     return `<div class="ph ${cls}" data-label="${esc(label)}">${media}</div>`;
   };
   const P = (o) => esc(JSON.stringify(o || {}));
+  // 카카오톡 기본 프사 ('default') 또는 사진
+  const KDEF = '<svg viewBox="0 0 40 40"><circle cx="20" cy="15.5" r="6.8" fill="#fff"/><path d="M7.5 34c1.4-6.6 6.4-10 12.5-10s11.1 3.4 12.5 10z" fill="#fff"/></svg>';
+  const kava = (src, label = '', cls = '') => (!src || src === 'default')
+    ? `<div class="ph kdef ${cls}">${KDEF}</div>` : ph(src, label, cls);
 
   let toastTimer;
   function toast(msg) {
@@ -37,6 +46,11 @@
     unlocked: false,
     stack: [],
     bannersStarted: false,
+    done: new Set(),
+    alertShown: false,
+    backHome: false,
+    seenStories: new Set(),
+    typed: false,
     bannerIdx: -1
   };
   const chatById = (id) => KAKAO.chats.find((c) => c.id === id);
@@ -90,7 +104,7 @@
     statusEl.innerHTML = `
       <div class="left">
         ${showTime ? `<span data-clock>${hm()}</span>` : ''}
-        ${showTime ? `<span class="sb-music">♫ <span>${esc(CONFIG.nowPlaying.title)} · ${esc(CONFIG.nowPlaying.artist)}</span></span>` : ''}
+        ${showTime ? `<span class="sb-music"><b>♫</b><span class="mq"><span>${esc(CONFIG.nowPlaying.title)} · ${esc(CONFIG.nowPlaying.artist)}</span></span></span>` : ''}
       </div>
       <div class="right">
         <svg class="sb-icon" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
@@ -185,12 +199,117 @@
     }
   }
 
+  /* ---------- 홈 화면 지도 위젯 ---------- */
+  function seongchanSpot() {
+    if (state.backHome) return 'home';   // 4개 완료: 둘이 같이 집으로
+    const n = state.done.size;
+    return n === 0 ? 'home' : n === 1 ? 'mid' : 'gym';
+  }
+  function personPin(p, cls) {
+    return `<div class="mw-pin ${cls}">${ph(p.avatar, p.name, 'round')}<span>${esc(p.name)}</span></div>`;
+  }
+  function mapWidgetHtml() {
+    const W = MAP_WIDGET;
+    const at = W.places[seongchanSpot()];
+    const gym = W.places.gym;
+    const withE = state.done.size >= 3;
+    return `<div class="map-widget" data-open="map">
+      <div class="mw-map">
+        <svg class="mw-roads" viewBox="0 0 320 150" preserveAspectRatio="none">
+          <rect width="320" height="150" fill="#eef0f3"/>
+          <g fill="#e2e5ea">${[[10,8,60,30],[80,8,70,30],[160,8,55,30],[225,8,85,30],[10,48,45,40],[65,48,80,40],[155,48,65,40],[230,48,80,40],[10,98,70,44],[90,98,60,44],[160,98,70,44],[240,98,70,44]].map(([x,y,w,h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`).join('')}</g>
+          <rect x="18" y="52" width="40" height="30" rx="4" fill="#d6ecd2"/>
+          <rect x="248" y="104" width="54" height="34" rx="4" fill="#fbecc4"/>
+          <g fill="none" stroke-linecap="round">
+            <path d="M0 42 H320" stroke="#7dce82" stroke-width="5"/>
+            <path d="M0 94 H320" stroke="#7dce82" stroke-width="4"/>
+            <path d="M74 0 V150" stroke="#7dce82" stroke-width="4"/>
+            <path d="M152 0 V150" stroke="#7dce82" stroke-width="6"/>
+            <path d="M152 0 V60" stroke="#f29b4b" stroke-width="6"/>
+            <path d="M152 88 V108" stroke="#e5534b" stroke-width="6"/>
+            <path d="M224 0 V150" stroke="#7dce82" stroke-width="4"/>
+            <path d="M0 42 H70" stroke="#f29b4b" stroke-width="5"/>
+            <path d="M224 94 H320" stroke="#e5534b" stroke-width="4"/>
+            <path d="M152 94 Q190 120 230 128 L320 132" stroke="#f29b4b" stroke-width="4"/>
+          </g>
+        </svg>
+        <span class="mw-label" style="left:${gym.x}%;top:${gym.y + 4}%">${esc(gym.label)}</span>
+        <span class="mw-label" style="left:${W.places.home.x}%;top:${W.places.home.y + 4}%">${esc(W.places.home.label)}</span>
+        <div class="mw-pos" id="mwSeongchan" style="left:${at.x}%;top:${at.y}%">${personPin(W.seongchan, 'sc')}</div>
+        <div class="mw-pos ${withE ? 'show' : ''}" id="mwEunseok" style="${eunseokStyle()}">${personPin(W.eunseok, 'es')}</div>
+        <span class="mw-zoom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5M8 10.5h5"/></svg></span>
+      </div>
+      <span class="lbl">지도</span>
+    </div>`;
+  }
+  // 은석 핀: 체육관에서 '띡' 나타났다가(히든 설정: 성찬이 은석 폰을 뺏어 위치 공유 등록), 마지막엔 집으로
+  function eunseokStyle() {
+    const p = MAP_WIDGET.places[state.backHome ? 'home' : 'gym'];
+    return `left:${p.x + 12}%;top:${p.y}%`;
+  }
+  function updateMapWidget() {
+    const W = MAP_WIDGET;
+    const sc = document.getElementById('mwSeongchan');
+    if (sc) { const at = W.places[seongchanSpot()]; sc.style.left = at.x + '%'; sc.style.top = at.y + '%'; }
+    const es = document.getElementById('mwEunseok');
+    if (es) { es.classList.toggle('show', state.done.size >= 3); es.setAttribute('style', eunseokStyle()); }
+  }
+
+  /* ---------- 할 일 (미션) ---------- */
+  // stories: 희수 스토리 2개 / rise: 라이즈 단톡방 / eunseok: 은석 카톡방 / comment: 얼라이브 게시글 댓글
+  const MISSIONS = ['stories', 'rise', 'eunseok', 'comment'];
+  function mission(key) {
+    if (!key || state.done.has(key)) return;
+    state.done.add(key);
+    updateMapWidget();
+    if (MISSIONS.every((k) => state.done.has(k)) && !state.alertShown) {
+      state.alertShown = true;
+      setTimeout(showPetcamAlert, PETCAM_ALERT.delay || 1500);
+    }
+  }
+  function showPetcamAlert() {
+    state.backHome = true;
+    updateMapWidget();
+    const old = bannerEl.firstElementChild;
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.className = 'banner pc-banner';
+    el.innerHTML = `
+      <div class="b-ava pc-ico">🐾</div>
+      <div class="b-body">
+        <div class="b-app">펫캠 · ${esc(PETCAM_ALERT.title)} <small>지금</small></div>
+        <div class="b-title">겨울이네 🐶</div>
+        <div class="b-text">${esc(PETCAM_ALERT.text)}</div>
+      </div>`;
+    el.addEventListener('click', (e) => { e.stopPropagation(); el.remove(); openPetcamPopup(); });
+    bannerEl.appendChild(el);
+  }
+  const popLayer = document.createElement('div');
+  popLayer.className = 'pop-layer';
+  phoneEl.appendChild(popLayer);
+  function openPetcamPopup() {
+    const c = clockNow();
+    const ts = `2026-06-03 ${String(c.h).padStart(2, '0')}:${String(c.m).padStart(2, '0')}`;
+    popLayer.innerHTML = `
+      <div class="pp-dim" data-act="closePop"></div>
+      <div class="pp-card">
+        <div class="pp-head"><span class="pp-app">🐾 펫캠</span><b>${esc(PETCAM_ALERT.cam)} 캠</b><button class="pp-x" data-act="closePop">✕</button></div>
+        <div class="pp-media">${ph(PETCAM_ALERT.media, PETCAM_ALERT.label, 'dark')}<span class="pp-rec">● 움직임 감지</span><span class="pp-ts">${ts}</span></div>
+        <div class="pp-text">${esc(PETCAM_ALERT.text)}</div>
+        <div class="pp-btns"><button data-act="closePop">닫기</button><button class="pri" data-act="popToPetcam">펫캠 열기</button></div>
+      </div>`;
+    popLayer.classList.add('open');
+    popLayer.querySelectorAll('video').forEach((v) => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
+  }
+  function closePop() { popLayer.classList.remove('open'); popLayer.innerHTML = ''; }
+
   /* ---------- 홈 ---------- */
   S.home = () => ({
     status: 'normal', ui: 'light',
     html: `<div class="scr home no-anim">
       ${ph(CONFIG.homeWallpaper, '', 'wall')}
       <div class="grid">
+        ${mapWidgetHtml()}
         ${HOME_APPS.map((a) => `<div class="app" data-open="${a.id}">${iconHtml(a)}<span class="lbl">${esc(a.label)}</span></div>`).join('')}
       </div>
       <div class="search-pill">🔍 검색</div>
@@ -232,7 +351,7 @@
       const l = lastOf(c);
       const prev = previewText(l);
       return `<div class="item" data-go="kakaoRoom" data-p="${P({ id: c.id })}">
-        ${ph(c.avatar, c.name.slice(0, 2), 'kk-ava')}
+        ${kava(c.avatar, c.name.slice(0, 2), 'kk-ava')}
         <div class="grow" style="flex:1;min-width:0">
           <div class="name">${esc(c.name)}${c.group ? ` <small>${c.members}</small>` : ''}</div>
           <div class="prev">${esc(prev)}</div>
@@ -281,7 +400,7 @@
     const unreadMark = me && m.read === false && !chat.group ? '<span class="r">1</span>' : '';
     const side = `<div class="side">${unreadMark}${!sameAsNext ? `<span>${esc(m.t)}</span>` : ''}</div>`;
     return `<div class="m ${me ? 'me' : ''} ${isNew ? 'new-msg' : ''}">
-      ${!me ? (showHead ? ph(avatarSrc, m.from.slice(-2), 'ava') : '<div class="ava blank" style="width:38px"></div>') : ''}
+      ${!me ? (showHead ? kava(avatarSrc, m.from.slice(-2), 'ava') : '<div class="ava blank" style="width:38px"></div>') : ''}
       <div class="col">
         ${showHead ? `<div class="who">${esc(m.from)}</div>` : ''}
         <div class="line">${bub}${side}</div>
@@ -310,15 +429,15 @@
         <div class="msgs" id="msgs">${roomBody(chat)}</div>
         <div class="room-input"><span class="pl">＋</span><div class="box">메시지 입력</div><span class="pl">☺</span><span class="pl">#</span></div>
       </div>`,
-      after(el) { el.scrollTop = el.scrollHeight; }
+      after() { const ms = $('#msgs'); ms.scrollTop = ms.scrollHeight; mission(id === 'rise' ? 'rise' : id === 'eunseok' ? 'eunseok' : null); }
     };
   };
 
   /* ---------- 배너 (11화 알림) ---------- */
-  function startBanners() {
+  function startBanners(now) {
     if (state.bannersStarted) return;
     state.bannersStarted = true;
-    let t = BANNER_TIMING.firstDelay;
+    let t = now === true ? 0 : BANNER_TIMING.firstDelay;
     BANNERS.forEach((b, i) => {
       if (i > 0) t += b.delay ?? BANNER_TIMING.gap;
       setTimeout(() => showBanner(b, i), t);
@@ -335,7 +454,7 @@
     // 열려 있는 화면 갱신
     if (inRoom) {
       const msgs = $('#msgs');
-      if (msgs) { msgs.innerHTML = roomBody(chat); const r = $('#room'); r.scrollTop = r.scrollHeight; }
+      if (msgs) { msgs.innerHTML = roomBody(chat); msgs.scrollTop = msgs.scrollHeight; }
     } else if (cur && cur.name === 'kakao') {
       const keep = $('#kkList') ? $('#kkList').scrollTop : 0;
       render(false); const l = $('#kkList'); if (l) l.scrollTop = keep;
@@ -344,6 +463,7 @@
     if (badge) { badge.textContent = kakaoTotal(); badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
 
     if (inRoom) return;
+    if (bannerEl.querySelector('.pc-banner')) return;   // 펫캠 알림이 떠 있으면 그대로 둬요
     const old = bannerEl.firstElementChild;
     if (old) { old.classList.add('out'); setTimeout(() => old.remove(), 340); }
     const el = document.createElement('div');
@@ -351,7 +471,7 @@
     el.dataset.chat = b.chat;
     const ava = KAKAO.avatars[b.sender] || chat.avatar;
     el.innerHTML = `
-      <div class="b-ava">${ph(ava, b.sender.slice(-2))}<span class="mini">TALK</span></div>
+      <div class="b-ava">${kava(ava, b.sender.slice(-2))}<span class="mini">TALK</span></div>
       <div class="b-body">
         <div class="b-app">카카오톡 · ${esc(b.title)} <small>지금</small></div>
         <div class="b-title">${esc(b.sender)}</div>
@@ -570,76 +690,225 @@
 
   /* ---------- 인스타그램 ---------- */
   const IG = INSTAGRAM;
-  function igTabs() {
-    return `<div class="ig-tabs"><span data-tab="instagram">⌂</span><span data-tab="igSearch">⌕</span><span data-toast="새 게시물">⊕</span><span data-toast="릴스">▶</span><span class="me" data-tab="igMe">${ph(IG.me.avatar, '', 'round')}</span></div>`;
+  // 인스타 아이콘: 전부 같은 굵기(2px)의 선 아이콘
+  const svg = (d, extra = '') => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+  const IC = {
+    heart: svg('<path d="M12 20.3s-7.6-4.6-9.4-9.3C1.3 7.6 3.6 4.2 7 4.2c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.4 0 5.7 3.4 4.4 6.8-1.8 4.7-9.4 9.3-9.4 9.3z"/>'),
+    comment: svg('<path d="M20.6 15.6A9 9 0 1 0 17 19.4L21 21z"/>'),
+    repost: svg('<path d="M17 2.5l3.5 3.5L17 9.5"/><path d="M3.5 11V9.5a3.5 3.5 0 0 1 3.5-3.5h13.5"/><path d="M7 21.5L3.5 18 7 14.5"/><path d="M20.5 13v1.5a3.5 3.5 0 0 1-3.5 3.5H3.5"/>'),
+    send: svg('<path d="M21.5 2.5L10.2 13.8"/><path d="M21.5 2.5l-7 19-4.3-7.7-7.7-4.3z"/>'),
+    bookmark: svg('<path d="M19 21l-7-5.2L5 21V4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5z"/>'),
+    home: svg('<path d="M3.5 10.2L12 3l8.5 7.2V20a1 1 0 0 1-1 1H15v-6.5H9V21H4.5a1 1 0 0 1-1-1z"/>'),
+    search: svg('<circle cx="10.8" cy="10.8" r="7.3"/><path d="M16.2 16.2L21 21"/>'),
+    plus: svg('<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/>'),
+    reels: svg('<rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M9.5 3l3 5.5M15.5 3l3 5.5"/><path d="M10.2 12.3v5.2l4.5-2.6z"/>'),
+    more: svg('<circle cx="5" cy="12" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="19" cy="12" r=".9"/>', 'stroke-width="2.4"'),
+    back: svg('<path d="M15 4l-8 8 8 8"/>'),
+    close: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
+    menu: svg('<path d="M3.5 6h17M3.5 12h17M3.5 18h17"/>'),
+    image: svg('<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.8" cy="8.8" r="1.7"/><path d="M21 15.5l-5-5L5 21"/>'),
+    gif: svg('<rect x="2.5" y="4.5" width="19" height="15" rx="3.5"/><path d="M9.8 10H8a1.5 1.5 0 0 0-1.5 1.5v1A1.5 1.5 0 0 0 8 14h1.8v-2H8.6M12.5 10v4M15.5 14v-4h2.5M15.5 12h2"/>', 'stroke-width="1.8"'),
+    camera: svg('<path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h2l1.5-2h6l1.5 2h2A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.6"/>'),
+    person: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4" fill="#c7c7cc"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6z" fill="#c7c7cc"/></svg>'
+  };
+  function igTabs(on = '') {
+    const t = (k, ic) => `<span data-tab="${k}" class="${on === k ? 'on' : ''}">${ic}</span>`;
+    return `<div class="ig-tabs">${t('instagram', IC.home)}${t('igSearch', IC.search)}<span data-toast="새 게시물">${IC.plus}</span><span data-toast="릴스">${IC.reels}</span><span class="me ${on === 'igMe' ? 'on' : ''}" data-tab="igMe">${ph(IG.me.avatar, '', 'round')}</span></div>`;
   }
   const ring = (src, seen, extra = '') => `<div class="ring ${seen ? 'seen' : ''}" ${extra}><div class="in">${ph(src, '', 'round')}</div></div>`;
-  /* --- 인스타 댓글: 독자가 직접 다는 댓글 (이 브라우저에만 저장돼요) --- */
+  /* --- 인스타 댓글: 독자가 직접 다는 댓글 ---
+     COMMENTS_API_URL이 있으면 모든 독자가 같이 보는 공유 댓글,
+     없으면 이 브라우저에만 저장되는 댓글로 동작해요. */
   const READER_ID_LIST = (typeof READER_IDS !== 'undefined' && READER_IDS.length) ? READER_IDS
     : ['ilovegay', 'zltmgo', 'rubyeontae', 'insomnia', 'icantsleep', 'yourbyeontae', 'aburasoba', 'mandu', 'byeontae', 'bigbunny', 'rockndeer', 'imbyeontae'];
+  const SHARED = !!COMMENTS_API_URL;
   const store = {
     get(k, d) { try { const v = localStorage.getItem('scphone.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('scphone.' + k, JSON.stringify(v)); } catch (e) { /* 저장 불가 환경 */ } }
   };
+  const memComments = {};      // 로컬 모드: 저장이 막힌 브라우저용
+  const sharedComments = {};   // 공유 모드: 서버에서 받아 온 댓글
   const mention = (t) => esc(t).replace(/(^|\s)(@[\w._]+)/g, '$1<span class="mention">$2</span>');
-  function igCommentsHtml(f, fi) {
+  function ago(at) {
+    if (!at) return '방금';
+    const d = (Date.now() - new Date(at).getTime()) / 1000;
+    if (!(d >= 0) || d < 60) return '방금';
+    if (d < 3600) return Math.floor(d / 60) + '분';
+    if (d < 86400) return Math.floor(d / 3600) + '시간';
+    if (d < 86400 * 7) return Math.floor(d / 86400) + '일';
+    return Math.floor(d / (86400 * 7)) + '주';
+  }
+  function readerList(fi) {
+    if (SHARED) return sharedComments[fi] || [];
+    return store.get('igc.' + fi, null) || memComments[fi] || [];
+  }
+  function commentTotal(f, fi) {
     const base = f.comments || [];
-    const mine = store.get('igc.' + fi, null) || memComments[fi] || [];
-    const total = base.reduce((n, c) => n + 1 + (c.replies ? c.replies.length : 0), 0) + mine.length;
-    if (!total) return '';
-    const row = (c, reply) => `<div class="tx ig-cmt ${reply ? 'reply' : ''} ${c.reader ? 'mine' : ''}"><b>${esc(c.id)}</b> ${mention(c.text)}${c.reader ? ' <small>방금</small>' : ''}</div>`;
-    return `<div class="tx"><small>댓글 ${total}개 모두 보기</small></div>
-      ${base.map((c) => row(c) + (c.replies || []).map((r) => row(r, true)).join('')).join('')}
-      ${mine.map((c) => row(c)).join('')}`;
+    return base.reduce((n, c) => n + 1 + (c.replies ? c.replies.length : 0), 0) + readerList(fi).length;
   }
-  function addReaderComment(fi, text) {
-    text = text.trim();
+  function commentListHtml(f, fi) {
+    const base = f.comments || [];
+    const mine = readerList(fi);
+    if (!base.length && !mine.length) {
+      return `<div class="cs-empty"><b>아직 댓글이 없습니다</b><small>댓글을 남겨보세요.</small></div>`;
+    }
+    const row = (c, reply) => `<div class="cs-row ${reply ? 'reply' : ''}">
+        <div class="cs-ava">${c.avatar ? ph(c.avatar, '', 'round') : IC.person}</div>
+        <div class="cs-body">
+          <div class="cs-meta"><b>${esc(c.id)}</b><small>${c.reader ? ago(c.at) : esc(c.ago || '6일')}</small></div>
+          <div class="cs-text">${mention(c.text)}</div>
+          <div class="cs-sub">답글 달기</div>
+        </div>
+        <span class="cs-like" data-act="cmtLike">${IC.heart}</span>
+      </div>`;
+    return base.map((c) => row(c) + (c.replies || []).map((r) => row(r, true)).join('')).join('')
+      + mine.map((c) => row(c)).join('');
+  }
+  function refreshComments(fi) {
+    const list = document.getElementById('csList');
+    if (list && sheetPost === fi) { list.innerHTML = commentListHtml(IG.feed[fi], fi); list.scrollTop = list.scrollHeight; }
+    document.querySelectorAll(`[data-cnt-comment="${fi}"]`).forEach((el) => { el.textContent = commentTotal(IG.feed[fi], fi); });
+    const more = document.getElementById('igmore-' + fi);
+    if (more) { const n = commentTotal(IG.feed[fi], fi); more.textContent = n ? `댓글 ${n}개 모두 보기` : ''; }
+  }
+
+  /* 댓글 창 열고 닫기 */
+  const sheetLayer = document.createElement('div');
+  sheetLayer.className = 'sheet-layer';
+  phoneEl.appendChild(sheetLayer);
+  let sheetPost = null;
+  const EMOJIS = ['❤️', '🙌', '🔥', '👏', '😢', '😍', '😮', '😂'];
+  function openSheet(fi) {
+    sheetPost = fi;
+    const f = IG.feed[fi];
+    sheetLayer.innerHTML = `
+      <div class="cs-dim" data-act="closeSheet"></div>
+      <div class="cs">
+        <div class="cs-grab" data-act="closeSheet"><i></i></div>
+        <div class="cs-title">댓글</div>
+        <div class="cs-list" id="csList">${commentListHtml(f, fi)}</div>
+        <div class="cs-emoji">${EMOJIS.map((e) => `<button type="button" data-act="addEmoji" data-e="${e}">${e}</button>`).join('')}</div>
+        <form class="cs-input ig-add" data-post="${fi}">
+          <div class="cs-me">${ph(IG.me.avatar, '', 'round')}</div>
+          <div class="cs-box">
+            <input type="text" maxlength="150" placeholder="회원님의 생각을 남겨보세요." autocomplete="off" spellcheck="false">
+            <span class="cs-tools">${IC.image}${IC.gif}</span>
+            <button type="submit" class="cs-post">게시</button>
+          </div>
+        </form>
+      </div>`;
+    sheetLayer.classList.add('open');
+    const inp = sheetLayer.querySelector('input');
+    const sync = () => sheetLayer.querySelector('.cs-box').classList.toggle('typing', !!inp.value.trim());
+    inp.addEventListener('input', sync);
+    const list = document.getElementById('csList');
+    list.scrollTop = 0;
+    loadShared(fi);
+  }
+  function closeSheet() {
+    if (sheetPost === null) return;
+    sheetPost = null;
+    sheetLayer.classList.remove('open');
+    sheetLayer.innerHTML = '';
+  }
+  // 공유 모드: 서버에서 댓글 불러오기
+  function loadShared(fi) {
+    if (!SHARED) return;
+    fetch(`${COMMENTS_API_URL}?post=${fi}&t=${Date.now()}`)
+      .then((r) => r.json())
+      .then((d) => {
+        sharedComments[fi] = (d.comments || []).map((c) => ({ id: c.id, text: c.text, at: c.at, reader: true }));
+        refreshComments(fi);
+      })
+      .catch(() => {});
+  }
+  let lastPost = 0;
+  function addReaderComment(fi, text, form) {
+    text = text.trim().slice(0, 150);
     if (!text) return;
-    const n = store.get('igc.n', 0);
-    const list = store.get('igc.' + fi, []);
-    list.push({ id: READER_ID_LIST[n % READER_ID_LIST.length], text, reader: true });
-    store.set('igc.' + fi, list);
-    store.set('igc.n', n + 1);
-    // 저장이 막힌 환경에서도 이번 화면에선 보이게
-    if (store.get('igc.' + fi, null) === null) memComments[fi] = list;
-    const box = document.getElementById('igc-' + fi);
-    if (box) box.innerHTML = igCommentsHtml(IG.feed[fi], fi);
+    if (!SHARED) {
+      const n = store.get('igc.n', 0);
+      const list = readerList(fi).slice();
+      list.push({ id: READER_ID_LIST[n % READER_ID_LIST.length], text, reader: true, at: new Date().toISOString() });
+      store.set('igc.' + fi, list);
+      store.set('igc.n', n + 1);
+      memComments[fi] = list;
+      refreshComments(fi);
+      mission('comment');
+      return;
+    }
+    // 같은 사람이 너무 빨리 연달아 올리지 못하게 (10초)
+    if (Date.now() - lastPost < 10000) { toast('조금 있다가 다시 달아 주세요'); return; }
+    lastPost = Date.now();
+    const btn = form && form.querySelector('button');
+    if (btn) { btn.disabled = true; btn.textContent = '게시 중'; }
+    fetch(COMMENTS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ post: fi, text })
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.ok) throw new Error('fail');
+        loadShared(fi);
+        mission('comment');
+      })
+      .catch(() => { toast('댓글을 올리지 못했어요. 잠시 후 다시 시도해 주세요'); lastPost = 0; })
+      .finally(() => { if (btn) { btn.disabled = false; btn.textContent = '게시'; } });
   }
-  const memComments = {};
+  const liked = {};
+  const saved = {};
+  const num = (v) => Number(String(v).replace(/,/g, '')) || 0;
+  const baseLikes = (f) => num(f.likes) - (f.likedByMe ? 1 : 0);
+  const fmt = (n) => (n >= 10000 ? (Math.floor(n / 1000) / 10).toString().replace(/\.0$/, '') + '만' : n.toLocaleString());
   S.instagram = () => ({
     status: 'normal', ui: 'dark',
     html: `<div class="scr ig">
-      <div class="ig-top"><span class="logo">Instagram</span><div class="ic"><span>♡</span><span class="dm">✉<i>2</i></span></div></div>
+      <div class="ig-top"><span class="logo">Instagram</span><div class="ic"><span>${IC.heart}</span><span class="dm">${IC.send}<i>2</i></span></div></div>
       <div class="stories">
         <div class="story" data-go="igStory" data-p="${P({ u: 'me', i: 0 })}">${ring(IG.me.avatar, true)}<span>내 스토리</span></div>
         ${IG.storyBar.map((s) => { const has = s.id === IG.heesu.id || (IG.otherStories && IG.otherStories[s.id]); return `<div class="story" ${has ? `data-go="igStory" data-p="${P({ u: s.id, i: 0 })}"` : `data-toast="${esc(s.id)}"`}>${ring(s.avatar, s.seen)}<span>${esc(s.id)}</span></div>`; }).join('')}
       </div>
-      ${IG.feed.map((f, fi) => `<div class="ig-post">
-        <div class="hd">${ph(f.avatar, '', 'round')}${esc(f.user)}</div>
-        ${ph(f.img, f.label, 'pic')}
-        <div class="acts"><span>♡</span><span data-act="igFocus" data-i="${fi}">💬</span><span>➤</span></div>
-        <div class="tx"><b>좋아요 ${esc(f.likes)}개</b></div>
+      ${IG.feed.map((f, fi) => {
+        // 좋아요 누른 친구들 (게시물 왼쪽 아래). data.js의 likers로 바꿀 수 있어요
+        const likers = f.likers || [{ avatar: IG.heesu.avatar }, { avatar: 'images/profile/sohee.jpg' }];
+        if (liked[fi] === undefined) liked[fi] = !!f.likedByMe;
+        const likes = baseLikes(f) + (liked[fi] ? 1 : 0);
+        return `<div class="ig-post">
+        <div class="hd">${ph(f.avatar, '', 'round')}<b>${esc(f.user)}</b><span class="more">${IC.more}</span></div>
+        <div class="pic-wrap" data-act="igDoubleLike" data-i="${fi}">
+          ${ph(f.img, f.label, 'pic')}
+          <div class="likers">${likers.map((l) => `<span class="lk">${ph(l.avatar, '', 'round')}<i>♥</i></span>`).join('')}</div>
+        </div>
+        <div class="bar">
+          <span class="b ${liked[fi] ? 'liked' : ''}" data-act="igLike" data-i="${fi}">${IC.heart}<em id="iglikes-${fi}">${fmt(likes)}</em></span>
+          <span class="b" data-act="igComments" data-i="${fi}">${IC.comment}<em data-cnt-comment="${fi}">${commentTotal(f, fi)}</em></span>
+          <span class="b">${IC.repost}<em>${esc(f.reposts || '12')}</em></span>
+          <span class="b">${IC.send}<em>${esc(f.shares || '54')}</em></span>
+          <span class="b save ${saved[fi] ? 'on' : ''}" data-act="igSave" data-i="${fi}">${IC.bookmark}</span>
+        </div>
         <div class="tx"><b>${esc(f.user)}</b> ${esc(f.caption)}</div>
-        <div id="igc-${fi}">${igCommentsHtml(f, fi)}</div>
-        <div class="tx"><small>${esc(f.time)}</small></div>
-        <form class="ig-add" data-post="${fi}">
-          ${ph(IG.me.avatar, '', 'round')}
-          <input type="text" maxlength="150" placeholder="댓글 달기..." autocomplete="off" spellcheck="false">
-          <button type="submit">게시</button>
-        </form>
-      </div>`).join('')}
+        <div class="tx more-c" id="igmore-${fi}" data-act="igComments" data-i="${fi}">${commentTotal(f, fi) ? `댓글 ${commentTotal(f, fi)}개 모두 보기` : ''}</div>
+        <div class="tx when">${esc(f.time)}</div>
+      </div>`; }).join('')}
       <div class="pad-bottom" style="height:20px"></div>
-      ${igTabs()}
-    </div>`
+      ${igTabs('instagram')}
+    </div>`,
+    after() { IG.feed.forEach((_, fi) => loadShared(fi)); }
   });
+  // 공유 모드: 인스타 피드를 보고 있는 동안 20초마다 새 댓글 확인
+  setInterval(() => {
+    const cur = currentScreen();
+    if (SHARED && cur && cur.name === 'instagram') IG.feed.forEach((_, fi) => loadShared(fi));
+  }, 20000);
   S.igSearch = () => ({
     status: 'normal', ui: 'dark',
     html: `<div class="scr ig ig-search">
-      <div class="box">⌕ <span class="typed">김</span></div>
+      <div class="box">${IC.search}<span class="typed">김</span></div>
       <h5>최근 검색 항목 <small>모두 보기</small></h5>
-      ${IG.recentSearch.map((u) => `<div class="ig-user" ${u.id === IG.heesu.id ? `data-go="igProfile"` : `data-toast="${esc(u.id)}"`}>${ph(u.avatar, '', 'round')}<div><b>${esc(u.id)}</b><small>${esc(u.name)}</small></div><span class="x">✕</span></div>`).join('')}
+      ${IG.recentSearch.map((u) => `<div class="ig-user" ${u.id === IG.heesu.id ? `data-go="igProfile"` : `data-toast="${esc(u.id)}"`}>${ph(u.avatar, '', 'round')}<div><b>${esc(u.id)}</b><small>${esc(u.name)}</small></div><span class="x">${IC.close}</span></div>`).join('')}
       <div class="pad-bottom" style="height:380px"></div>
-      ${igTabs()}
+      ${igTabs('igSearch')}
     </div>`
   });
   S.igMe = () => {
@@ -647,7 +916,7 @@
     return {
       status: 'normal', ui: 'dark',
       html: `<div class="scr ig">
-        <div class="ig-prof-head">${esc(me.id)} <span style="margin-left:auto;font-size:22px;font-weight:400">⊕ ≡</span></div>
+        <div class="ig-prof-head">${esc(me.id)}<span class="hd-ic">${IC.plus}${IC.menu}</span></div>
         <div class="ig-prof">
           <div class="r1">${ring(me.avatar, true, `data-go="igStory" data-p="${P({ u: 'me', i: 0 })}"`)}
             <div class="stats"><div><b>${me.posts}</b>게시물</div><div><b>${me.followers}</b>팔로워</div><div><b>${me.following}</b>팔로잉</div></div>
@@ -658,7 +927,7 @@
         </div>
         <div class="ig-grid">${Array.from({ length: me.grid || 9 }, (_, i) => ph(`images/instagram/me-grid-${i + 1}.jpg`, `게시물 ${i + 1}`)).join('')}</div>
         <div class="pad-bottom" style="height:20px"></div>
-        ${igTabs()}
+        ${igTabs('igMe')}
       </div>`
     };
   };
@@ -667,7 +936,7 @@
     return {
       status: 'normal', ui: 'dark',
       html: `<div class="scr ig">
-        <div class="ig-prof-head"><button class="bk" data-back>‹</button>${esc(h.id)}</div>
+        <div class="ig-prof-head"><button class="bk" data-back>${IC.back}</button>${esc(h.id)}<span class="hd-ic">${IC.more}</span></div>
         <div class="ig-prof">
           <div class="r1">${ring(h.avatar, false, `data-go="igStory" data-p="${P({ i: 0 })}"`)}
             <div class="stats"><div><b>${h.posts}</b>게시물</div><div><b>${h.followers}</b>팔로워</div><div><b>${h.following}</b>팔로잉</div></div>
@@ -696,12 +965,18 @@
       html: `<div class="scr story-view zoom-in">
         <div class="media">${ph(s.img, s.label, 'dark')}</div>
         <div class="bars">${h.stories.map((_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>
-        <div class="who">${ph(h.avatar, '', 'round')}${esc(h.id)} <small>${esc(s.ago)}</small><span class="x" data-back>×</span></div>
+        <div class="who">${ph(h.avatar, '', 'round')}${esc(h.id)} <small>${esc(s.ago)}</small><span class="x" data-back>${IC.close}</span></div>
         ${s.caption ? `<div class="cap">${esc(s.caption)}</div>` : ''}
         <div class="tapzone"><div data-act="storyPrev"></div><div data-act="storyNext"></div></div>
-        <div class="reply"><div ${h.id === IG.heesu.id ? 'data-go="igDm"' : ''}>메시지 보내기</div><span>♡</span><span>➤</span></div>
+        <div class="reply"><div ${h.id === IG.heesu.id ? 'data-go="igDm"' : ''}>메시지 보내기</div><span>${IC.heart}</span><span>${IC.send}</span></div>
       </div>`,
-      after() { storyTimer = setTimeout(() => storyStep(1), 5000); }
+      after() {
+        storyTimer = setTimeout(() => storyStep(1), 5000);
+        if (h.id === IG.heesu.id) {
+          state.seenStories.add(i);
+          if (IG.heesu.stories.every((_, k) => state.seenStories.has(k))) mission('stories');
+        }
+      }
     };
   };
   function storyStep(d) {
@@ -719,17 +994,42 @@
     return {
       status: 'normal', ui: 'dark',
       html: `<div class="scr dm">
-        <div class="dm-head"><button class="bk" data-back>‹</button>${ph(h.avatar, '', 'round')}<div><b>${esc(h.name)}</b><small>${esc(h.id)}</small></div></div>
+        <div class="dm-head"><button class="bk" data-back>${IC.back}</button>${ph(h.avatar, '', 'round')}<div><b>${esc(h.name)}</b><small>${esc(h.id)}</small></div></div>
         <div class="dm-body">${ph(h.avatar, '', 'round')}<b>${esc(h.name)}</b><small>${esc(h.id)} · Instagram</small><small>팔로워 ${h.followers}명 · 게시물 ${h.posts}개</small><button>프로필 보기</button></div>
-        <div class="dm-input"><div><span>📷</span><input class="tx-in" id="dmInput" type="text" value="${esc(state.dmText ?? IG.dmDraft)}" autocomplete="off" spellcheck="false"><span class="send" aria-disabled="true">보내기</span></div></div>
+        <div class="dm-input"><div><span class="cam">${IC.camera}</span><input class="tx-in" id="dmInput" type="text" value="${esc(state.dmText ?? '')}" ${state.typed ? '' : 'readonly'} autocomplete="off" spellcheck="false"><span class="send" aria-disabled="true">보내기</span></div></div>
       </div>`,
       after() {
         const inp = $('#dmInput');
-        inp.addEventListener('input', () => { state.dmText = inp.value; });
+        inp.addEventListener('input', () => { if (state.typed) state.dmText = inp.value; });
+        startTyping();
         inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
       }
     };
   };
+
+  // 링크를 열면 DM 입력창에 글자가 한 글자씩 써지고, 다 써지면 카톡 배너 시작
+  let typingStarted = false;
+  function startTyping() {
+    if (typingStarted || state.typed) return;
+    typingStarted = true;
+    const chars = [...IG.dmDraft];
+    let k = 0;
+    state.dmText = '';
+    const step = () => {
+      k += 1;
+      state.dmText = chars.slice(0, k).join('');
+      const inp = document.getElementById('dmInput');
+      if (inp) inp.value = state.dmText;
+      if (k < chars.length) {
+        setTimeout(step, DM_TYPING.speed + Math.random() * 120 - 40);
+      } else {
+        state.typed = true;
+        if (inp) inp.removeAttribute('readonly');
+        setTimeout(() => startBanners(true), BANNER_TIMING.afterTyping ?? 1200);
+      }
+    };
+    setTimeout(step, DM_TYPING.startDelay);
+  }
 
   /* ---------- 펫캠 ---------- */
   S.petcam = ({ cam = 'living' }) => {
@@ -995,6 +1295,7 @@
     const cur = currentScreen();
     const fn = S[cur.name];
     const out = fn(cur.params || {});
+    closeSheet();
     renderStatus(out.status);
     phoneEl.classList.toggle('ui-light', out.ui === 'light');
     screenEl.innerHTML = out.html;
@@ -1018,6 +1319,7 @@
   }
   function goHome(fromUnlock) {
     clearTimeout(storyTimer);
+    closePop();
     state.stack = [{ name: 'home', params: {} }];
     render(false);
     if (fromUnlock) {
@@ -1054,7 +1356,23 @@
     switch (a) {
       case 'cancelPass': state.stack = [{ name: 'lock', params: {} }]; render(false); break;
       case 'storyNext': storyStep(1); break;
-      case 'igFocus': { const i = document.querySelector(`.ig-add[data-post="${el.dataset.i}"] input`); if (i) i.focus(); break; }
+      case 'igComments': openSheet(+el.dataset.i); break;
+      case 'closeSheet': closeSheet(); break;
+      case 'closePop': closePop(); break;
+      case 'popToPetcam': closePop(); openApp('petcam'); break;
+      case 'addEmoji': { const i = sheetLayer.querySelector('input'); if (i) { i.value += el.dataset.e; i.dispatchEvent(new Event('input')); i.focus(); } break; }
+      case 'cmtLike': el.classList.toggle('on'); break;
+      case 'igSave': { const k = +el.dataset.i; saved[k] = !saved[k]; el.classList.toggle('on', saved[k]); break; }
+      case 'igLike': case 'igDoubleLike': {
+        const k = +el.dataset.i;
+        if (a === 'igDoubleLike') { const now = Date.now(); if (now - (el._t || 0) > 350) { el._t = now; break; } el._t = 0; if (liked[k]) break; }
+        liked[k] = !liked[k];
+        const b = document.querySelector(`.b[data-act="igLike"][data-i="${k}"]`);
+        if (b) { b.classList.toggle('liked', liked[k]); b.classList.remove('pop'); void b.offsetWidth; if (liked[k]) b.classList.add('pop'); }
+        const c = document.getElementById('iglikes-' + k);
+        if (c) c.textContent = fmt(baseLikes(IG.feed[k]) + (liked[k] ? 1 : 0));
+        break;
+      }
       case 'storyPrev': storyStep(-1); break;
       case 'alarm': {
         const al = ALARMS[+el.dataset.i]; al.on = !al.on;
@@ -1073,12 +1391,13 @@
     if (!f) return;
     e.preventDefault();
     const inp = f.querySelector('input');
-    addReaderComment(+f.dataset.post, inp.value);
+    addReaderComment(+f.dataset.post, inp.value, f);
     inp.value = '';
+    const box = f.querySelector('.cs-box'); if (box) box.classList.remove('typing');
   });
   $('#homeIndicator').addEventListener('click', () => { if (state.unlocked) goHome(false); });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') back();
+    if (e.key === 'Escape') { if (popLayer.classList.contains('open')) { closePop(); return; } if (sheetPost !== null) { closeSheet(); return; } back(); }
     const cur = currentScreen();
     if (cur && cur.name === 'passcode' && /^\d$/.test(e.key)) pressKey(e.key);
   });
@@ -1092,5 +1411,7 @@
   else if (location.hash === '#lock') { state.unlocked = false; state.stack = [{ name: 'lock', params: {} }]; }
   else state.stack = [{ name: 'home', params: {} }, { name: 'igSearch', params: {} }, { name: 'igProfile', params: {} }, { name: 'igDm', params: {} }];
   render(false);
-  startBanners();
+  // 희수 DM에서 시작하면 타이핑이 끝난 뒤 배너가 시작돼요 (startTyping). 그 외에는 바로 시작.
+  if (currentScreen().name !== 'igDm' && state.unlocked) { state.typed = true; startBanners(); }
+  if (!state.unlocked) state.typed = true;
 })();
