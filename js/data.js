@@ -438,14 +438,14 @@ const INSTAGRAM = {
 /* ---------------- 펫캠 ---------------- */
 const PETCAM = {
   cams: [
-    { id: 'living', name: '거실', live: 'images/petcam/live-living.jpg', liveLabel: '빈 거실, 소파 위 터그 장난감' },
+    { id: 'living', name: '거실', live: 'images/petcam/live-living.png', liveLabel: '빈 거실, 소파 위 터그 장난감' },
     // 5/22 아침 이후로 침실 캠은 꺼 둠
     { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '', off: true, offSince: '5월 22일 오전 8:31' }
   ],
   // blur:true → 썸네일 흐리게, 재생 안 됨 / .gif 파일을 넣으면 움짤로 재생돼요
   clips: [
     { date: '2026-06-03', items: [
-      { cam: 'living', time: '01:51', tag: '움직임 감지', img: 'images/petcam/clip-0603-0151.jpg', label: '현관으로 뛰어가는 성찬, 따라 나온 겨울이' }
+      { cam: 'living', time: '01:51', tag: '움직임 감지', img: 'images/petcam/clip-0603-0151.mp4', label: '현관으로 뛰어가는 성찬, 따라 나온 겨울이' }
     ]},
     { date: '2026-05-25', items: [
       { cam: 'living', time: '21:46', tag: '사람 감지', img: 'images/petcam/clip-0525-2146.jpg', label: '부엌 쪽, 화면 밖', blur: true },
@@ -453,7 +453,7 @@ const PETCAM = {
     ]},
     { date: '2026-05-22', items: [
       { cam: 'bedroom', time: '08:31', tag: '카메라 꺼짐', img: '', label: '', system: true },
-      { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.gif', label: '아침 상황 (움짤)', star: true }
+      { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.mp4', label: '아침 상황 (움짤)', star: true }
     ]},
     { date: '2026-05-21', items: [
       { cam: 'bedroom', time: '03:12', tag: '사람 감지', img: 'images/petcam/clip-0521-0312.jpg', label: '침실', blur: true }
@@ -468,7 +468,7 @@ const PETCAM = {
     ]},
     { date: '2026-04-07', items: [
       { cam: 'bedroom', time: '23:31', tag: '사람 감지', img: 'images/petcam/clip-0407-2331.jpg', label: '캠을 요리조리 살피는 은석', blur: true, star: true },
-      { cam: 'living', time: '23:24', tag: '사람 감지', img: 'images/petcam/clip-0407-2324.png', label: '거실 캠 앞으로 다가오는 은석' }
+      { cam: 'living', time: '23:24', tag: '사람 감지', img: 'images/petcam/clip-0407-2324.mp4', label: '거실 캠 앞으로 다가오는 은석' }
     ]},
     { date: '2026-04-04', items: [
       // 타로가 23:02에 '실시간' 사진을 올린 뒤 → 은석이 성찬 집으로 달려와 캠을 쳐다봄 (파일 이름은 그대로)
@@ -642,7 +642,7 @@ const PETCAM_ALERT = {
   cam: '거실',
   title: '거실 캠',
   text: '사람의 움직임이 감지되었어요',
-  media: 'images/petcam/alert-0603.gif',   // .mp4로 바꿔도 돼요
+  media: 'images/petcam/alert-0603.mp4',   // .mp4로 바꿔도 돼요
   label: '현관으로 들어오는 두 사람',
   delay: 1500                               // 4번째를 끝내고 알림이 뜰 때까지 (ms)
 };
