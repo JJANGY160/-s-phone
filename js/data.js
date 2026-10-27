@@ -64,12 +64,12 @@ const BANNER_TIMING = { firstDelay: 3000, gap: 1900, afterTyping: 1200 };
 // 링크를 열면 DM 입력창에 글자가 한 글자씩 써져요 (startDelay: 시작 전 대기, speed: 한 글자당 ms)
 const DM_TYPING = { startDelay: 900, speed: 230 };
 const BANNERS = [
-  { chat: 'rise', title: '🏀', sender: '미디 이소희', text: '은석이형 아직도 체육관이에요??' },
-  { chat: 'rise', title: '🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
-  { chat: 'rise', title: '🏀', sender: '경제 타로형', text: '은석 아직도 체육관이라고? 먼일이래' },
-  { chat: 'rise', title: '🏀', sender: '미디 이소희', text: '멀라요 문잠그는것만 까먹지 마요' },
+  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '은석이형 아직도 체육관이에요??' },
+  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
+  { chat: 'rise', title: '라이즈🏀', sender: '경제 타로형', text: '은석 아직도 체육관이라고? 먼일이래' },
+  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '멀라요 문잠그는것만 까먹지 마요' },
   // delay: 바로 앞 배너와의 간격(ms). 없으면 BANNER_TIMING.gap
-  { chat: 'rise', title: '🏀', sender: '은석이', text: '죽는다 이소희', delay: 5000 }
+  { chat: 'rise', title: '라이즈🏀', sender: '은석이', text: '죽는다 이소희', delay: 5000 }
 ];
 
 /* ---------------- 카카오톡 ---------------- */
@@ -97,7 +97,7 @@ const KAKAO = {
   },
   chats: [
     {
-      id: 'rise', name: '🏀', group: true, members: 14, avatar: 'images/kakao/rise.jpg', unread: 0, // 배너가 오면서 늘어나요
+      id: 'rise', name: '라이즈🏀', group: true, members: 14, avatar: 'images/kakao/rise.jpg', unread: 0, // 배너가 오면서 늘어나요
       messages: [
         { date: '2026-04-04' },
         { from: '경제 타로형', type: 'photo', src: 'images/kakao/rise-0404-run.jpg', label: '은석이 어딘가로 달려가는 사진', t: '오후 11:02' },
@@ -218,7 +218,7 @@ const KAKAO = {
       messages: [
         { date: '2026-06-02' },
         { from: '은영 누나', text: '오늘 김치찌개 잘 먹었다~', t: '오후 8:15' },
-        { from: '은영 누나', text: '목요일 연습 빼는거 잊지마라 정성찬', t: '오후 8:15' },
+        { from: '은영 누나', text: '목요일 연습 빼는 거 잊지 마라 정성찬', t: '오후 8:15' },
         { from: 'me', text: '넹ㅠㅠ', t: '오후 8:40', read: true }
       ]
     },
@@ -300,13 +300,16 @@ const EVERYTIME = {
     ]},
     secret: { name: '비밀게시판', posts: [
       { title: '남긱사 요즘 누가 새벽에 자꾸 샤워하냐?', body: '4층인데 3시에 물소리 나서 깸 진짜 누구임', time: '05/19', likes: 57, comments: 23 },
+      { title: '10년지기 친구랑 어색해졌는데', body: '아니다 그냥 내가 알아서 할게', time: '05/30', likes: 4, comments: 2 }
+    ]},
     soccer: { name: '축구봐영⚽', posts: [
       { title: '이럴거면 그냥 슛돌이나 봤지', body: '어제 경기 진심 무슨 축구임', time: '05/24', likes: 21, comments: 14 },
       { title: '일요일 춘천 원정 같이 갈 사람', body: '자리 2개 남음', time: '06/01', likes: 3, comments: 5 }
     ]},
     rainbow: { name: '무영지개🌈', posts: [
       { title: '학교근처에 퀴어바 괜찮은데 있음?', body: '분위기 조용한 데로', time: '06/01', likes: 6, comments: 11 },
-      { title: '남소 받을사람', body: '울학교아니어도됨', time: '05/27', likes: 2, comments: 4 },
+      { title: '남소 받아요 (24, 미디과)', body: '애니 좋아하는 사람이면 좋겠음', time: '05/27', likes: 2, comments: 4 },
+      { title: '여소 해줄 사람', body: '농담', time: '05/22', likes: 0, comments: 1 },
       { id: 'hetero', title: '난 솔직히 ㅎㅌㄹ가 더 쉽더라', body: 'ㅎㅌㄹ들이 한번 아래 맛들리면 더 매달림\n방금도 ㅎㅌㄹ 한명 뚫어줌', time: '25/11/21', likes: 9, comments: 8, scraps: 10, scrapped: true }
     ]}
   },
