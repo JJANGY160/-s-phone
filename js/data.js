@@ -428,7 +428,7 @@ const INSTAGRAM = {
     // 11화: 성찬이 밤새 들락거린 스토리 두 개
     stories: [
       { img: 'images/instagram/story-1-aburasoba.jpg', label: '아부라소바 사진 (양파 종지가 걸린 컷)', caption: '은석이 형이 사준 아부라소바', ago: '7시간' },
-      { img: 'images/instagram/story-2-cocktail.jpg', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
+      { img: 'images/instagram/story-2-cocktail.png', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
     ]
   },
   // 김희수 DM: 보내지 못한 채 입력창에 남은 문장
@@ -472,7 +472,7 @@ const PETCAM = {
     ]},
     { date: '2026-04-04', items: [
       // 타로가 23:02에 '실시간' 사진을 올린 뒤 → 은석이 성찬 집으로 달려와 캠을 쳐다봄 (파일 이름은 그대로)
-      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.jpg', label: '캠을 빤히 쳐다보는 은석' },
+      { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.gif', label: '캠을 빤히 쳐다보는 은석' },
       { cam: 'bedroom', time: '21:40', tag: '사람 감지', img: 'images/petcam/clip-0404-2140.jpg', label: '침대 위 뒷모습', blur: true, star: true },
       { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.gif', label: '은석 품에 뛰어드는 겨울이' }
     ]},
