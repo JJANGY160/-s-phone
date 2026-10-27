@@ -467,11 +467,11 @@ const PETCAM = {
     ]},
     // 성찬 혼자 찍힌 날 ① 5/10 저녁 (앨범 '겨울이 터그놀이' 사진과 같은 날)
     { date: '2026-05-10', items: [
-      { cam: 'living', time: '20:38', tag: '움직임 감지', img: 'images/petcam/clip-0510-2038.jpg', label: '거실에서 겨울이랑 터그놀이 하는 성찬' }
+      { cam: 'living', time: '20:38', tag: '움직임 감지', img: 'images/petcam/clip-0510-2038.gif', label: '거실에서 겨울이랑 터그놀이 하는 성찬' }
     ]},
     // 성찬 혼자 찍힌 날 ② 4/19 새벽 (미윤 '잘 지내?' 카톡 온 다음 날 새벽, 은석과 서먹하던 때)
     { date: '2026-04-19', items: [
-      { cam: 'living', time: '02:14', tag: '사람 감지', img: 'images/petcam/clip-0419-0214.jpg', label: '불 꺼진 거실, 소파에 혼자 앉아 핸드폰 보는 성찬' }
+      { cam: 'living', time: '02:14', tag: '사람 감지', img: 'images/petcam/clip-0419-0214.mp4', label: '불 꺼진 거실, 소파에 혼자 앉아 핸드폰 보는 성찬' }
     ]},
     { date: '2026-04-07', items: [
       { cam: 'bedroom', time: '23:31', tag: '사람 감지', blur: true, star: true },
