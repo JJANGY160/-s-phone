@@ -305,8 +305,7 @@ window.addEventListener('error', (e) => {
   function showPetcamAlert() {
     state.backHome = true;
     updateMapWidget();
-    const old = bannerEl.firstElementChild;
-    if (old) old.remove();
+    bannerEl.innerHTML = '';   // 떠 있던 카톡 배너는 모두 치워요
     const el = document.createElement('div');
     el.className = 'banner pc-banner';
     el.innerHTML = `
@@ -497,10 +496,9 @@ window.addEventListener('error', (e) => {
     const badge = $('.badge[data-badge="kakao"]');
     if (badge) { badge.textContent = kakaoTotal(); badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
 
-    if (inRoom) return;
+    if (inRoom) { dismissKakaoBanners(); return; }
     if (bannerEl.querySelector('.pc-banner')) return;   // 펫캠 알림이 떠 있으면 그대로 둬요
-    const old = bannerEl.firstElementChild;
-    if (old) { old.classList.add('out'); setTimeout(() => old.remove(), 340); }
+    const hadOld = dismissKakaoBanners();               // 떠 있던 카톡 배너는 전부 올려 보내요
     const el = document.createElement('div');
     el.className = 'banner';
     el.dataset.chat = b.chat;
@@ -518,8 +516,19 @@ window.addEventListener('error', (e) => {
       state.stack = [{ name: 'home', params: {} }, { name: 'kakao', params: {} }];
       go('kakaoRoom', { id: b.chat });
     });
-    setTimeout(() => bannerEl.appendChild(el), old ? 200 : 0);
-    if (i === BANNERS.length - 1) setTimeout(() => { if (el.isConnected) { el.classList.add('out'); setTimeout(() => el.remove(), 340); } }, 9000);
+    setTimeout(() => { if (!bannerEl.querySelector('.pc-banner')) bannerEl.appendChild(el); }, hadOld ? 200 : 0);
+    // 모든 배너는 일정 시간이 지나면 저절로 올라가요 (마지막 배너는 조금 더 오래)
+    setTimeout(() => dismissBanner(el), i === BANNERS.length - 1 ? 9000 : 6000);
+  }
+  function dismissBanner(el) {
+    if (!el || !el.isConnected || el.classList.contains('out')) return;
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 360);
+  }
+  function dismissKakaoBanners() {
+    const list = [...bannerEl.querySelectorAll('.banner:not(.pc-banner)')];
+    list.forEach(dismissBanner);
+    return list.length > 0;
   }
   function clearBanners() { bannerEl.innerHTML = ''; }
 
@@ -1068,6 +1077,16 @@ window.addEventListener('error', (e) => {
   }
 
   /* ---------- 펫캠 ---------- */
+  // 흐림 처리 영상: 사진 없이 흐릿한 화면만 그려요 (침실/거실마다 색감이 달라요)
+  function blurThumb(it) {
+    const seed = [...(it.time + it.cam)].reduce((a, c) => a + c.charCodeAt(0), 0);
+    const x1 = 25 + (seed % 40), y1 = 30 + (seed % 30), x2 = 85 - (seed % 35);
+    const warm = it.cam === 'bedroom';
+    const bg = warm
+      ? `radial-gradient(circle at ${x1}% ${y1}%, #a9876c 0 16%, transparent 38%), radial-gradient(ellipse at ${x2}% 70%, #6b5546 0 22%, transparent 50%), linear-gradient(160deg,#3b3029,#1d1815)`
+      : `radial-gradient(circle at ${x1}% ${y1}%, #8b8f9c 0 15%, transparent 36%), radial-gradient(ellipse at ${x2}% 72%, #5b5f6b 0 24%, transparent 52%), linear-gradient(160deg,#2c2f37,#16181d)`;
+    return `<div class="ph dark blur-fake"><i style="background:${bg}"></i></div>`;
+  }
   S.petcam = ({ cam = 'living' }) => {
     const c = PETCAM.cams.find((x) => x.id === cam);
     const camName = (id) => PETCAM.cams.find((x) => x.id === id).name;
@@ -1086,8 +1105,8 @@ window.addEventListener('error', (e) => {
         ${PETCAM.clips.map((g, gi) => `
           <div class="pc-date">${dateLabel(g.date)}</div>
           ${g.items.map((it, ii) => it.system ? `<div class="pc-clip pc-sys"><span class="sys-ico">⏻</span><div><b>${esc(it.time)} · ${esc(it.tag)}</b><small>${esc(camName(it.cam))} 캠</small></div></div>` : `<div class="pc-clip" data-go="petcamClip" data-p="${P({ g: gi, i: ii })}">
-            ${ph(it.img, it.blur ? '' : it.label, `dark ${it.blur ? 'blur' : ''}`)}
-            <div><b>${esc(it.time)} · ${esc(it.tag)}</b><small>${esc(camName(it.cam))} 캠${it.blur ? ' · 🙈' : ''}</small></div>
+            ${it.blur ? blurThumb(it) : ph(it.img, it.label, 'dark')}
+            <div><b>${esc(it.time)} · ${esc(it.tag)}</b><small>${esc(camName(it.cam))} 캠</small></div>
             ${it.star ? '<span class="star">★</span>' : ''}
           </div>`).join('')}`).join('')}
         <div class="pad-bottom"></div>
@@ -1102,9 +1121,9 @@ window.addEventListener('error', (e) => {
       status: 'normal', ui: 'light',
       html: `<div class="scr pc pc-player">
         <div class="pc-head"><button data-back style="font-size:17px;color:#5ac8fa">‹ 녹화 기록</button><span></span></div>
-        <div class="vid ${it.blur ? 'blur' : ''}">${ph(it.img, it.blur ? '' : it.label, 'dark')}<button class="play" data-act="${it.blur ? 'blurPlay' : 'play'}">▶</button></div>
+        <div class="vid ${it.blur ? 'blur' : ''}">${it.blur ? blurThumb(it) : ph(it.img, it.label, 'dark')}<button class="play" data-act="${it.blur ? 'blurPlay' : 'play'}">▶</button></div>
         <div class="bar"><i id="pcbar"></i></div>
-        <div class="meta">${dateLabel(grp.date)} ${esc(it.time)}<br>${esc(camName)} 캠 · ${esc(it.tag)}${it.star ? '<br>★ 즐겨찾기한 영상' : ''}</div>
+        <div class="meta">${dateLabel(grp.date)} ${esc(it.time)}<br>${esc(camName)} 캠 · ${esc(it.tag)}</div>
       </div>`
     };
   };
@@ -1188,10 +1207,9 @@ window.addEventListener('error', (e) => {
       status: 'normal', ui: 'light',
       html: `<div class="scr viewer zoom-in">
         <div class="v-top"><button class="x" data-back>‹</button>
-          <div class="v-info"><b>${p.date ? esc(dateLabel(p.date).replace(/^\d+년 /, '')) : ''}</b><small>${esc(p.time || '')}${p.place ? ` · 📍${esc(p.place)}` : ''}${p.type ? ` · ${esc(p.type)}` : ''}</small></div>
+          <div class="v-info"><b>${p.date ? esc(dateLabel(p.date).replace(/^\d+년 /, '')) : ''}</b><small>${p.place ? `📍${esc(p.place)}` : ''}</small></div>
           <span style="width:30px"></span></div>
         ${ph(p.src, p.label, 'dark')}
-        ${p.caption ? `<div class="v-cap">${esc(p.caption)}</div>` : ''}
         <div class="v-bottom"><span>⇪</span><span>♡</span><span>ⓘ</span><span>🗑</span></div>
       </div>`
     };
@@ -1430,7 +1448,7 @@ window.addEventListener('error', (e) => {
         const bar = $('#pcbar'); bar.style.transition = 'width 6s linear'; requestAnimationFrame(() => (bar.style.width = '100%'));
         break;
       }
-      case 'blurPlay': toast('🙈 이 영상은 성찬만 볼 수 있어요'); break;
+      case 'blurPlay': toast('이 영상은 성찬만 볼 수 있어요'); break;
     }
   }
   document.addEventListener('submit', (e) => {

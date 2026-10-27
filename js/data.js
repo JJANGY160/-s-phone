@@ -89,7 +89,6 @@ const KAKAO = {
     '경제 타로형': 'images/profile/taro.jpg',
     '연영 박원빈': 'images/profile/wonbin.jpg',
     '사회 강민석': 'default',
-    '연영 앤톤리': 'default',
     '연영 앤톤리': 'images/profile/anton.jpg',
     '은영 누나': 'default',
     '홍동기획 강성하': 'default',
@@ -97,7 +96,7 @@ const KAKAO = {
     '홍동 손연주': 'default',
     '홍동 이유은': 'default',
     '미윤': 'default',
-    '지원 (홍대)': 'default',
+    '지원 (멉대)': 'default',
     '채린': 'default',
     '체교 한도윤': 'default'
   },
@@ -442,39 +441,46 @@ const PETCAM = {
     // 5/22 아침 이후로 침실 캠은 꺼 둠
     { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '', off: true, offSince: '5월 22일 오전 8:31' }
   ],
-  // blur:true → 썸네일 흐리게, 재생 안 됨 / .gif 파일을 넣으면 움짤로 재생돼요
+  // blur:true → 사진 없이 흐린 화면으로 표시, 재생 안 됨 (img 필요 없음)
+  // .gif/.mp4 파일을 넣으면 움짤·영상으로 재생돼요
   clips: [
     { date: '2026-06-03', items: [
       { cam: 'living', time: '01:51', tag: '움직임 감지', img: 'images/petcam/clip-0603-0151.mp4', label: '현관으로 뛰어가는 성찬, 따라 나온 겨울이' }
     ]},
     { date: '2026-05-25', items: [
-      { cam: 'living', time: '21:46', tag: '사람 감지', img: 'images/petcam/clip-0525-2146.jpg', label: '부엌 쪽, 화면 밖', blur: true },
-      { cam: 'living', time: '20:12', tag: '움직임 감지', img: 'images/petcam/clip-0525-2012.jpg', label: '산책 다녀온 겨울이' }
+      { cam: 'living', time: '21:46', tag: '사람 감지', blur: true }
     ]},
     { date: '2026-05-22', items: [
       { cam: 'bedroom', time: '08:31', tag: '카메라 꺼짐', img: '', label: '', system: true },
       { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.mp4', label: '아침 상황 (움짤)', star: true }
     ]},
     { date: '2026-05-21', items: [
-      { cam: 'bedroom', time: '03:12', tag: '사람 감지', img: 'images/petcam/clip-0521-0312.jpg', label: '침실', blur: true }
+      { cam: 'bedroom', time: '03:12', tag: '사람 감지', blur: true }
     ]},
     // 축제 끝난 밤(5/14) ~ 다음 날 아침(5/15)
     { date: '2026-05-15', items: [
-      { cam: 'living', time: '10:41', tag: '사람 감지', img: 'images/petcam/clip-0515-1041.jpg', label: '거실 소파', blur: true },
-      { cam: 'bedroom', time: '03:20', tag: '움직임 감지', img: 'images/petcam/clip-0515-0320.jpg', label: '침실', blur: true }
+      { cam: 'living', time: '10:41', tag: '사람 감지', blur: true },
+      { cam: 'bedroom', time: '03:20', tag: '움직임 감지', blur: true }
     ]},
     { date: '2026-05-14', items: [
-      { cam: 'bedroom', time: '23:52', tag: '사람 감지', img: 'images/petcam/clip-0514-2352.jpg', label: '침실', blur: true, star: true }
+      { cam: 'bedroom', time: '23:52', tag: '사람 감지', blur: true, star: true }
+    ]},
+    // 성찬 혼자 찍힌 날 ① 5/10 저녁 (앨범 '겨울이 터그놀이' 사진과 같은 날)
+    { date: '2026-05-10', items: [
+      { cam: 'living', time: '20:38', tag: '움직임 감지', img: 'images/petcam/clip-0510-2038.jpg', label: '거실에서 겨울이랑 터그놀이 하는 성찬' }
+    ]},
+    // 성찬 혼자 찍힌 날 ② 4/19 새벽 (미윤 '잘 지내?' 카톡 온 다음 날 새벽, 은석과 서먹하던 때)
+    { date: '2026-04-19', items: [
+      { cam: 'living', time: '02:14', tag: '사람 감지', img: 'images/petcam/clip-0419-0214.jpg', label: '불 꺼진 거실, 소파에 혼자 앉아 핸드폰 보는 성찬' }
     ]},
     { date: '2026-04-07', items: [
-      { cam: 'bedroom', time: '23:31', tag: '사람 감지', img: 'images/petcam/clip-0407-2331.jpg', label: '캠을 요리조리 살피는 은석', blur: true, star: true },
+      { cam: 'bedroom', time: '23:31', tag: '사람 감지', blur: true, star: true },
       { cam: 'living', time: '23:24', tag: '사람 감지', img: 'images/petcam/clip-0407-2324.mp4', label: '거실 캠 앞으로 다가오는 은석' }
     ]},
     { date: '2026-04-04', items: [
       // 타로가 23:02에 '실시간' 사진을 올린 뒤 → 은석이 성찬 집으로 달려와 캠을 쳐다봄 (파일 이름은 그대로)
       { cam: 'living', time: '23:12', tag: '사람 감지', img: 'images/petcam/clip-0404-2258.gif', label: '캠을 빤히 쳐다보는 은석' },
-      { cam: 'bedroom', time: '21:40', tag: '사람 감지', img: 'images/petcam/clip-0404-2140.jpg', label: '침대 위 뒷모습', blur: true, star: true },
-      { cam: 'living', time: '18:03', tag: '움직임 감지', img: 'images/petcam/clip-0404-1803.gif', label: '은석 품에 뛰어드는 겨울이' }
+      { cam: 'bedroom', time: '21:40', tag: '사람 감지', blur: true, star: true }
     ]},
     { date: '2026-04-03', items: [
       { cam: 'living', time: '19:20', tag: '사람 감지', img: 'images/petcam/clip-0403-1920.png', label: '첫날, 겨울이를 쓰다듬는 은석' }
@@ -514,24 +520,24 @@ const ALARMS = [
 /* ---------------- 앨범 ---------------- */
 // 파일을 images/album/ 에 같은 이름으로 넣으면 보여요
 const ALBUM = {
-  // 최신순. date/time/place는 사진을 열면 위에 뜨고, caption은 아래에 떠요.
+  // 최신순. 사진을 열면 위에 날짜와 📍장소(place)가 떠요.
   // 은석 자는 사진(eunseok-*)은 은석이 자고 간 날 새벽 → 카톡·펫캠·캘린더 날짜와 맞물려요
   recent: [
-    { src: 'images/album/01.jpg', label: '자는 겨울이', date: '2026-06-03', time: '오전 12:23', place: '집', caption: '우리 애기 코 자' },
-    { src: 'images/album/eunseok-0525.jpg', label: '자는 은석', date: '2026-05-25', time: '오전 5:12', place: '집', caption: '1교시 어떡하냐 얘' },
-    { src: 'images/album/eunseok-0521.jpg', label: '자는 은석', date: '2026-05-21', time: '오전 3:40', place: '집', caption: '넥타이 그대로 잠듦ㅋㅋ' },
-    { src: 'images/album/04.jpg', label: '은석 단복 (단톡에서 저장)', date: '2026-05-20', time: '오전 10:48' },
-    { src: 'images/album/eunseok-0515.jpg', label: '자는 은석', date: '2026-05-15', time: '오전 4:20', place: '집', caption: '축제 끝. 기절' },
-    { src: 'images/album/05.jpg', label: '축제 부스', date: '2026-05-13', time: '오후 3:02', place: '영원대학교' },
-    { src: 'images/album/06.jpg', label: '겨울이 터그놀이', date: '2026-05-10', time: '오후 8:41', place: '집' },
-    { src: 'images/album/07.jpg', label: '겨울이', date: '2026-05-02', time: '오전 11:15', place: '집' },
-    { src: 'images/album/08.jpg', label: '겨울이', date: '2026-04-20', time: '오후 9:30', place: '집' },
-    { src: 'images/album/eunseok-0408.jpg', label: '자는 은석', date: '2026-04-08', time: '오전 3:05', place: '집', caption: '또 내 베개 뺏음' },
-    { src: 'images/album/09.jpg', label: '춘천 축구', date: '2026-04-05', time: '오전 10:27', place: '춘천' },
-    { src: 'images/album/10.jpg', label: '엠티', date: '2026-04-03', time: '오후 10:14', place: '가평' },
-    { src: 'images/album/graduation.jpg', label: '고등학교 졸업식 (엄마가 보내 준 사진)', date: '2026-03-28', time: '오후 8:11' },
-    { src: 'images/album/11.jpg', label: '겨울이 산책', date: '2026-03-28', time: '오후 5:50', place: '집' },
-    { src: 'images/album/12.jpg', label: '겨울이 아기 때', date: '2024-11-02', time: '오후 2:16', place: '집' }
+    { src: 'images/album/01.jpg', label: '자는 겨울이', date: '2026-06-03', place: '집' },
+    { src: 'images/album/eunseok-0525.jpg', label: '자는 은석', date: '2026-05-25', place: '집' },
+    { src: 'images/album/eunseok-0521.jpg', label: '자는 은석', date: '2026-05-21', place: '집' },
+    { src: 'images/album/04.jpg', label: '은석 단복 (단톡에서 저장)', date: '2026-05-20' },
+    { src: 'images/album/eunseok-0515.jpg', label: '자는 은석', date: '2026-05-15', place: '집' },
+    { src: 'images/album/05.jpg', label: '축제 부스', date: '2026-05-13', place: '영원대학교' },
+    { src: 'images/album/06.jpg', label: '겨울이 터그놀이', date: '2026-05-10', place: '집' },
+    { src: 'images/album/07.jpg', label: '겨울이', date: '2026-05-02', place: '집' },
+    { src: 'images/album/08.jpg', label: '겨울이', date: '2026-04-20', place: '집' },
+    { src: 'images/album/eunseok-0408.jpg', label: '자는 은석', date: '2026-04-08', place: '집' },
+    { src: 'images/album/09.jpg', label: '춘천 축구', date: '2026-04-05', place: '춘천' },
+    { src: 'images/album/10.jpg', label: '엠티', date: '2026-04-03', place: '가평' },
+    { src: 'images/album/graduation.jpg', label: '고등학교 졸업식 (엄마가 보내 준 사진)', date: '2026-03-28' },
+    { src: 'images/album/11.jpg', label: '겨울이 산책', date: '2026-03-28', place: '집' },
+    { src: 'images/album/12.jpg', label: '겨울이 아기 때', date: '2024-11-02', place: '집' }
   ],
   albums: [
     { name: '겨울이🐶', count: 1208, cover: 'images/album/06.jpg' },
