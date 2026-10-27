@@ -43,13 +43,11 @@ window.addEventListener('error', (e) => {
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // 이미지 자리: 파일이 있으면 이미지, 없으면 회색 자리 + 설명
   // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
-  // 이미지 자리: 사진을 불러오는 동안은 빈 배경만, 파일이 정말 없을 때만 줄무늬 + 설명(.empty)
-  const FAIL = "this.parentNode.classList.add('ph-empty');this.remove()";
+  // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
   const ph = (src, label = '', cls = '') => {
-    if (!src) return `<div class="ph ph-empty ${cls}" data-label="${esc(label)}"></div>`;
-    const media = /\.(mp4|webm)$/i.test(src)
-      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onloadeddata="this.classList.add('ok')" onerror="${FAIL}"></video>`
-      : `<img src="${esc(src)}" alt="" onload="this.classList.add('ok')" onerror="${FAIL}">`;
+    const media = /\.(mp4|webm)$/i.test(src || '')
+      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="this.remove()"></video>`
+      : `<img src="${esc(src)}" alt="" onerror="this.remove()">`;
     return `<div class="ph ${cls}" data-label="${esc(label)}">${media}</div>`;
   };
   const P = (o) => esc(JSON.stringify(o || {}));
