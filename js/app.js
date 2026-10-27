@@ -7,8 +7,30 @@
    비워 두면 댓글이 각 독자의 브라우저에만 저장돼요. (설정 방법: README.md '공유 댓글' 항목) */
 const COMMENTS_API_URL = '';
 
+/* 오류가 나면 검은 화면 대신 원인을 화면에 보여 줘요 (캡처해서 알려 주세요) */
+window.addEventListener('error', (e) => {
+  const sc = document.getElementById('screen');
+  if (!sc || document.getElementById('errBox')) return;
+  const box = document.createElement('div');
+  box.id = 'errBox';
+  box.style.cssText = 'position:absolute;left:16px;right:16px;top:80px;z-index:99;background:#fff;color:#c00;padding:14px;border-radius:12px;font:13px/1.5 sans-serif;white-space:pre-wrap;word-break:break-all';
+  box.textContent = '⚠️ 오류\n' + (e.message || '') + '\n' + (e.filename || '').split('/').pop() + ':' + (e.lineno || '');
+  sc.parentNode.appendChild(box);
+});
+
 (() => {
   'use strict';
+
+  /* data.js에 없는 설정은 기본값으로 (옛날 data.js와 섞여도 멈추지 않게) */
+  const DMT = (typeof DM_TYPING !== 'undefined') ? DM_TYPING : { startDelay: 900, speed: 230 };
+  const MAPW = (typeof MAP_WIDGET !== 'undefined') ? MAP_WIDGET : {
+    places: { home: { x: 68, y: 64, label: '집' }, mid: { x: 50, y: 62 }, gym: { x: 24, y: 62, label: '영원대 체육관' } },
+    seongchan: { name: '성찬', avatar: 'images/profile/seongchan.jpg' },
+    eunseok: { name: '은석', avatar: 'images/profile/eunseok.jpg' }
+  };
+  const PCA = (typeof PETCAM_ALERT !== 'undefined') ? PETCAM_ALERT : {
+    cam: '거실', title: '거실 캠', text: '사람의 움직임이 감지되었어요', media: 'images/petcam/alert-0603.gif', label: '현관으로 들어오는 두 사람', delay: 1500
+  };
 
   /* ---------- 기본 도구 ---------- */
   const $ = (s, el = document) => el.querySelector(s);
@@ -21,10 +43,13 @@ const COMMENTS_API_URL = '';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // 이미지 자리: 파일이 있으면 이미지, 없으면 회색 자리 + 설명
   // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
+  // 이미지 자리: 사진을 불러오는 동안은 빈 배경만, 파일이 정말 없을 때만 줄무늬 + 설명(.empty)
+  const FAIL = "this.parentNode.classList.add('empty');this.remove()";
   const ph = (src, label = '', cls = '') => {
-    const media = /\.(mp4|webm)$/i.test(src || '')
-      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="this.remove()"></video>`
-      : `<img src="${esc(src)}" alt="" onerror="this.remove()">`;
+    if (!src) return `<div class="ph empty ${cls}" data-label="${esc(label)}"></div>`;
+    const media = /\.(mp4|webm)$/i.test(src)
+      ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onloadeddata="this.classList.add('ok')" onerror="${FAIL}"></video>`
+      : `<img src="${esc(src)}" alt="" onload="this.classList.add('ok')" onerror="${FAIL}">`;
     return `<div class="ph ${cls}" data-label="${esc(label)}">${media}</div>`;
   };
   const P = (o) => esc(JSON.stringify(o || {}));
@@ -209,7 +234,7 @@ const COMMENTS_API_URL = '';
     return `<div class="mw-pin ${cls}">${ph(p.avatar, p.name, 'round')}<span>${esc(p.name)}</span></div>`;
   }
   function mapWidgetHtml() {
-    const W = MAP_WIDGET;
+    const W = MAPW;
     const at = W.places[seongchanSpot()];
     const gym = W.places.gym;
     const withE = state.done.size >= 3;
@@ -244,11 +269,11 @@ const COMMENTS_API_URL = '';
   }
   // 은석 핀: 체육관에서 '띡' 나타났다가(히든 설정: 성찬이 은석 폰을 뺏어 위치 공유 등록), 마지막엔 집으로
   function eunseokStyle() {
-    const p = MAP_WIDGET.places[state.backHome ? 'home' : 'gym'];
+    const p = MAPW.places[state.backHome ? 'home' : 'gym'];
     return `left:${p.x + 12}%;top:${p.y}%`;
   }
   function updateMapWidget() {
-    const W = MAP_WIDGET;
+    const W = MAPW;
     const sc = document.getElementById('mwSeongchan');
     if (sc) { const at = W.places[seongchanSpot()]; sc.style.left = at.x + '%'; sc.style.top = at.y + '%'; }
     const es = document.getElementById('mwEunseok');
@@ -264,7 +289,7 @@ const COMMENTS_API_URL = '';
     updateMapWidget();
     if (MISSIONS.every((k) => state.done.has(k)) && !state.alertShown) {
       state.alertShown = true;
-      setTimeout(showPetcamAlert, PETCAM_ALERT.delay || 1500);
+      setTimeout(showPetcamAlert, PCA.delay || 1500);
     }
   }
   function showPetcamAlert() {
@@ -277,9 +302,9 @@ const COMMENTS_API_URL = '';
     el.innerHTML = `
       <div class="b-ava pc-ico">🐾</div>
       <div class="b-body">
-        <div class="b-app">펫캠 · ${esc(PETCAM_ALERT.title)} <small>지금</small></div>
+        <div class="b-app">펫캠 · ${esc(PCA.title)} <small>지금</small></div>
         <div class="b-title">겨울이네 🐶</div>
-        <div class="b-text">${esc(PETCAM_ALERT.text)}</div>
+        <div class="b-text">${esc(PCA.text)}</div>
       </div>`;
     el.addEventListener('click', (e) => { e.stopPropagation(); el.remove(); openPetcamPopup(); });
     bannerEl.appendChild(el);
@@ -293,9 +318,9 @@ const COMMENTS_API_URL = '';
     popLayer.innerHTML = `
       <div class="pp-dim" data-act="closePop"></div>
       <div class="pp-card">
-        <div class="pp-head"><span class="pp-app">🐾 펫캠</span><b>${esc(PETCAM_ALERT.cam)} 캠</b><button class="pp-x" data-act="closePop">✕</button></div>
-        <div class="pp-media">${ph(PETCAM_ALERT.media, PETCAM_ALERT.label, 'dark')}<span class="pp-rec">● 움직임 감지</span><span class="pp-ts">${ts}</span></div>
-        <div class="pp-text">${esc(PETCAM_ALERT.text)}</div>
+        <div class="pp-head"><span class="pp-app">🐾 펫캠</span><b>${esc(PCA.cam)} 캠</b><button class="pp-x" data-act="closePop">✕</button></div>
+        <div class="pp-media">${ph(PCA.media, PCA.label, 'dark')}<span class="pp-rec">● 움직임 감지</span><span class="pp-ts">${ts}</span></div>
+        <div class="pp-text">${esc(PCA.text)}</div>
         <div class="pp-btns"><button data-act="closePop">닫기</button><button class="pri" data-act="popToPetcam">펫캠 열기</button></div>
       </div>`;
     popLayer.classList.add('open');
@@ -1021,14 +1046,14 @@ const COMMENTS_API_URL = '';
       const inp = document.getElementById('dmInput');
       if (inp) inp.value = state.dmText;
       if (k < chars.length) {
-        setTimeout(step, DM_TYPING.speed + Math.random() * 120 - 40);
+        setTimeout(step, DMT.speed + Math.random() * 120 - 40);
       } else {
         state.typed = true;
         if (inp) inp.removeAttribute('readonly');
         setTimeout(() => startBanners(true), BANNER_TIMING.afterTyping ?? 1200);
       }
     };
-    setTimeout(step, DM_TYPING.startDelay);
+    setTimeout(step, DMT.startDelay);
   }
 
   /* ---------- 펫캠 ---------- */
