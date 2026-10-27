@@ -365,7 +365,7 @@ const EVERYTIME = {
         { name: '스포츠교육론', room: '사범관 204', color: '#9ad08a', slots: [['월', 13.5, 14.75], ['수', 13.5, 14.75]] },
         { name: '체육측정평가', room: '체육관 205', color: '#e78fb3', slots: [['화', 15, 17.75]] },
         { name: '수상스포츠실기', room: '수영장', color: '#82d5d0', slots: [['수', 15, 16.75]] },
-        { name: '라이즈 연습', room: '체육관', color: '#c4c4c8', slots: [['목', 16, 19]] }
+        { name: '농구', room: '체육관', color: '#c4c4c8', slots: [['목', 16, 19]] }
       ]
     },
     friends: [
@@ -376,7 +376,7 @@ const EVERYTIME = {
           { name: '생활체육과건강', room: '체육관 실습실', color: '#f2c94c', slots: [['화', 13, 14.75]] },
           { name: '영상편집실습', room: '미디어관 B201', color: '#7fb3f5', slots: [['목', 13, 15.75]] },
           { name: '인터랙티브미디어', room: '미디어관 405', color: '#9ad08a', slots: [['월', 15, 16.25], ['수', 15, 16.25]] },
-          { name: '라이즈 연습', room: '체육관', color: '#c4c4c8', slots: [['목', 16, 19]] }
+          { name: '농구', room: '체육관', color: '#c4c4c8', slots: [['목', 16, 19]] }
         ] },
       { name: '이소희', open: false },
       { name: '오사키 쇼타로', open: false }
@@ -501,7 +501,7 @@ const CALENDAR_EVENTS = [
   { date: '2026-06-22', title: '겨울이 예방접종', time: '오전 11:00', color: '#ffd60a' }
 ];
 // 매주 목요일 반복 일정
-const CALENDAR_WEEKLY = [{ weekday: 4, title: '라이즈 연습', time: '오후 4:00', color: '#0a84ff' }];
+const CALENDAR_WEEKLY = [{ weekday: 4, title: '농구', time: '오후 4:00', color: '#0a84ff' }];
 
 /* ---------------- 시계 (알람) ---------------- */
 const ALARMS = [
