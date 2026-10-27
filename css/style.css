@@ -982,3 +982,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ph.blur-fake::before { content: '🔒'; position: relative; z-index: 3; font-size: 18px; opacity: .9; }
 .pc-player .vid .ph.blur-fake::before { content: none; }
 .pc-player .vid .ph.blur-fake i { filter: blur(20px); }
+
+/* ---------- 9차: 성찬 피드 게시물 화면 ---------- */
+.ig-prof-head .ttl2 { flex: 1; text-align: center; font-weight: 700; font-size: 16px; }
+.ig-grid > div { cursor: pointer; }
+.ig-grid > div .ph { width: 100%; aspect-ratio: 3/4; }
+.story-view .who .who-me { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
