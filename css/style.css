@@ -974,3 +974,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .spl-mini .pz { display: flex; gap: 4px; }
 .spl-mini .pz i { background: #fff; height: 16px; width: 4px; }
 .spl-mini { position: sticky; left: auto; right: auto; bottom: 30px; margin: 10px 8px 30px; }
+
+/* ---------- 8차: 흐림 영상(사진 없이 CSS로 흐린 화면) ---------- */
+.ph.blur-fake { position: relative; overflow: hidden; background: #15171c; display: grid; place-items: center; }
+.ph.blur-fake::after { content: none; }
+.ph.blur-fake i { position: absolute; inset: -20%; filter: blur(12px); }
+.ph.blur-fake::before { content: '🔒'; position: relative; z-index: 3; font-size: 18px; opacity: .9; }
+.pc-player .vid .ph.blur-fake::before { content: none; }
+.pc-player .vid .ph.blur-fake i { filter: blur(20px); }
