@@ -234,12 +234,12 @@ const KAKAO = {
     },
     {
       // 원나잇 추정 ①
-      id: 'on1', name: '지원 (홍대)', avatar: 'images/profile/jiwon.jpg', unread: 0,
+      id: 'on1', name: '지원 (멉대)', avatar: 'images/profile/jiwon.jpg', unread: 0,
       messages: [
         { date: '2026-03-15' },
-        { from: '지원 (홍대)', text: '잘 들어갔어?ㅎㅎ', t: '오전 11:20' },
+        { from: '지원 (멉대)', text: '잘 들어갔어?ㅎㅎ', t: '오전 11:20' },
         { from: 'me', text: 'ㅇㅇ', t: '오후 3:02', read: true },
-        { from: '지원 (홍대)', text: '담에 또 홍대 오면 연락해', t: '오후 3:05' }
+        { from: '지원 (멉대)', text: '담에 또 멉대 오면 연락해', t: '오후 3:05' }
       ]
     },
     {
@@ -248,7 +248,7 @@ const KAKAO = {
       messages: [
         { date: '2026-02-21' },
         { from: '채린', text: '번호 이거 맞지?', t: '오전 4:41' },
-        { from: '채린', text: '내 이어링 거기 떨어져 있으면 버려줘', t: '오후 1:16' }
+        { from: '채린', text: '내 귀걸이 거기 떨어져 있으면 버려줘', t: '오후 1:16' }
       ]
     },
     {
@@ -256,12 +256,13 @@ const KAKAO = {
       messages: [
         { date: '2026-05-25' },
         { from: '체교 한도윤', text: '형!! 오늘 과팅 장소랑 시간입니다', t: '오전 9:40' },
-        { from: '체교 한도윤', text: '7시 공일대 정문 앞 ‘오늘은’ 술집이요', t: '오전 9:40' },
-        { from: 'me', text: 'ㅇㅋ', t: '오전 9:52', read: true },
+        { from: '체교 한도윤', text: '와주셔서진짜진짜 감사합니다 은혜잊지않겟습니다형', t: '오전 9:40' },
+        { from: '체교 한도윤', text: '7시 공일대 정문 앞 ‘ㅇㄴㅇ’ 술집입니다~', t: '오전 9:40' },
+        { from: 'me', text: 'ㅋㅋ ㅇㅋ', t: '오전 9:52', read: true },
         { from: '체교 한도윤', text: '형 갑자기 어디 가셨어요ㅠㅠ', t: '오후 8:31' },
         { from: '체교 한도윤', text: '저쪽에서 형 번호 물어봤는데…', t: '오후 8:31' },
-        { from: 'me', text: 'ㅈㅅ 급한일', t: '오후 9:05', read: true },
-        { from: 'me', text: '번호는 주지 마라', t: '오후 9:05', read: true }
+        { from: 'me', text: '미안 급한일생김', t: '오후 9:05', read: true },
+        { from: 'me', text: '내번호주지마', t: '오후 9:05', read: true }
       ]
     }
   ]
@@ -383,7 +384,11 @@ const INSTAGRAM = {
         { id: 'seow_1', text: '영원대 가려고 방금 자퇴하고 옴' },
         { id: 'imnotgay', text: '내남자들 찾았다' },
         { id: 'ggu_guu_y', text: '진짜존나잘생ㅅ겼네' },
-        { id: 'n._.n22', text: '인스타정보' }
+        { id: 'n._.n22', text: '인스타정보' },
+        { id: 'donghi_8', text: '이분들 내년인가 졸업으로 알고있는데 지금 입학해서뭐함',
+          replies: [
+            { id: 'eunyounge', text: '@donghi_8 너 무슨과냐' }
+          ] }
       ] }
   ],
   heesu: {
