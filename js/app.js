@@ -45,6 +45,7 @@ window.addEventListener('error', (e) => {
   // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
   // .mp4 / .webm 경로면 소리 없이 자동 반복 재생되는 영상으로 보여 줘요
   const ph = (src, label = '', cls = '') => {
+    if (src === 'default') return `<div class="ph igdef ${cls}">${IGDEF}</div>`;
     const media = /\.(mp4|webm)$/i.test(src || '')
       ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto" onerror="this.remove()"></video>`
       : `<img src="${esc(src)}" alt="" onerror="this.remove()">`;
@@ -52,9 +53,17 @@ window.addEventListener('error', (e) => {
   };
   const P = (o) => esc(JSON.stringify(o || {}));
   // 카카오톡 기본 프사 ('default') 또는 사진
-  const KDEF = '<svg viewBox="0 0 40 40"><circle cx="20" cy="15.5" r="6.8" fill="#fff"/><path d="M7.5 34c1.4-6.6 6.4-10 12.5-10s11.1 3.4 12.5 10z" fill="#fff"/></svg>';
-  const kava = (src, label = '', cls = '') => (!src || src === 'default')
-    ? `<div class="ph kdef ${cls}">${KDEF}</div>` : ph(src, label, cls);
+  // 카톡 기본 프사: 이름마다 3가지 색 중 하나 (샘플 디자인)
+  const KTINTS = [['#94c9dc', '#ffffff'], ['#95bee7', '#c8dcf3'], ['#a3b6ea', '#cfd8f5']];
+  const kdefSvg = (name) => {
+    let h = 0; for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const [bg, fg] = KTINTS[h % KTINTS.length];
+    return `<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="${bg}"/><circle cx="20" cy="15.2" r="4.6" fill="${fg}"/><path d="M12.6 27.6c0-4.4 3.3-7 7.4-7s7.4 2.6 7.4 7z" fill="${fg}"/></svg>`;
+  };
+  const kava = (src, label = '', cls = '', name = label) => (!src || src === 'default')
+    ? `<div class="ph kdef ${cls}">${kdefSvg(name)}</div>` : ph(src, label, cls);
+  // 인스타 기본 프사 (회색 바탕 + 흰 사람)
+  const IGDEF = '<svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#dbdbdb"/><circle cx="20" cy="15" r="7.6" fill="#fff"/><path d="M5 40c0-9 6.7-14.5 15-14.5S35 31 35 40z" fill="#fff"/></svg>';
 
   let toastTimer;
   function toast(msg) {
@@ -127,7 +136,7 @@ window.addEventListener('error', (e) => {
     statusEl.innerHTML = `
       <div class="left">
         ${showTime ? `<span data-clock>${hm()}</span>` : ''}
-        ${showTime ? `<span class="sb-music"><b>♫</b><span class="mq"><span>${esc(CONFIG.nowPlaying.title)} · ${esc(CONFIG.nowPlaying.artist)}</span></span></span>` : ''}
+        ${showTime ? `<span class="sb-music"><b>♫</b><span class="mq"><span>${esc([CONFIG.nowPlaying.title, CONFIG.nowPlaying.artist].filter(Boolean).join(' · '))}</span></span></span>` : ''}
       </div>
       <div class="right">
         <svg class="sb-icon" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
@@ -147,6 +156,8 @@ window.addEventListener('error', (e) => {
       cls = 'clock-ico';
       const hd = hands();
       inner = `<div class="dial"><i class="h" style="transform:translateX(-50%) rotate(${hd.h}deg)"></i><i class="m" style="transform:translateX(-50%) rotate(${hd.m}deg)"></i><i class="s" style="transform:translateX(-50%) rotate(${hd.s}deg)"></i></div>`;
+    } else if (app.glyph === 'school') {
+      inner = `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M3 10.5L12 5l9 5.5"/><path d="M5 10v9h14v-9"/><path d="M10 19v-4.5h4V19"/><path d="M12 5V2.5h3"/><path d="M8 12.5h.01M16 12.5h.01"/></svg>`;
     } else if (app.glyph === 'TALK') {
       inner = `<span style="font-size:17px;font-weight:900;color:${app.glyphColor}">TALK</span>`;
     } else {
@@ -280,9 +291,10 @@ window.addEventListener('error', (e) => {
 
   /* ---------- 할 일 (미션) ---------- */
   // stories: 희수 스토리 2개 / rise: 라이즈 단톡방 / eunseok: 은석 카톡방 / comment: 얼라이브 게시글 댓글
-  const MISSIONS = ['stories', 'rise', 'eunseok', 'comment'];
+  // comment: 얼라이브 게시글 댓글 / scrap: 에타 '스크랩한 글' 화면 / spotify: 스포티파이 열기 / calendar: 캘린더 열기
+  const MISSIONS = ['comment', 'scrap', 'spotify', 'calendar'];
   function mission(key) {
-    if (!key || state.done.has(key)) return;
+    if (!key || !MISSIONS.includes(key) || state.done.has(key)) return;
     state.done.add(key);
     updateMapWidget();
     if (MISSIONS.every((k) => state.done.has(k)) && !state.alertShown) {
@@ -374,7 +386,7 @@ window.addEventListener('error', (e) => {
       const l = lastOf(c);
       const prev = previewText(l);
       return `<div class="item" data-go="kakaoRoom" data-p="${P({ id: c.id })}">
-        ${kava(c.avatar, c.name.slice(0, 2), 'kk-ava')}
+        ${kava(c.avatar, c.name.slice(0, 2), 'kk-ava', c.name)}
         <div class="grow" style="flex:1;min-width:0">
           <div class="name">${esc(c.name)}${c.group ? ` <small>${c.members}</small>` : ''}</div>
           <div class="prev">${esc(prev)}</div>
@@ -386,7 +398,7 @@ window.addEventListener('error', (e) => {
       status: 'normal', ui: 'dark',
       html: `<div class="scr kk" id="kkList">
         <div class="kk-head">
-          <div class="top"><h1>채팅</h1><div class="ico"><span>⌕</span><span>💬</span><span>⚙︎</span></div></div>
+          <div class="top"><h1>채팅</h1><div class="ico"><span>⌕</span><span>⚙︎</span></div></div>
           <div class="chips">
             <span class="chip on">전체</span>
             <span class="chip">💬 <span class="cnt">${total}</span></span>
@@ -423,7 +435,7 @@ window.addEventListener('error', (e) => {
     const unreadMark = me && m.read === false && !chat.group ? '<span class="r">1</span>' : '';
     const side = `<div class="side">${unreadMark}${!sameAsNext ? `<span>${esc(m.t)}</span>` : ''}</div>`;
     return `<div class="m ${me ? 'me' : ''} ${isNew ? 'new-msg' : ''}">
-      ${!me ? (showHead ? kava(avatarSrc, m.from.slice(-2), 'ava') : '<div class="ava blank" style="width:38px"></div>') : ''}
+      ${!me ? (showHead ? kava(avatarSrc, m.from.slice(-2), 'ava', KAKAO.avatars[m.from] ? m.from : chat.name) : '<div class="ava blank" style="width:38px"></div>') : ''}
       <div class="col">
         ${showHead ? `<div class="who">${esc(m.from)}</div>` : ''}
         <div class="line">${bub}${side}</div>
@@ -452,7 +464,7 @@ window.addEventListener('error', (e) => {
         <div class="msgs" id="msgs">${roomBody(chat)}</div>
         <div class="room-input"><span class="pl">＋</span><div class="box">메시지 입력</div><span class="pl">☺</span><span class="pl">#</span></div>
       </div>`,
-      after() { const ms = $('#msgs'); ms.scrollTop = ms.scrollHeight; mission(id === 'rise' ? 'rise' : id === 'eunseok' ? 'eunseok' : null); }
+      after() { const ms = $('#msgs'); ms.scrollTop = ms.scrollHeight; }
     };
   };
 
@@ -494,7 +506,7 @@ window.addEventListener('error', (e) => {
     el.dataset.chat = b.chat;
     const ava = KAKAO.avatars[b.sender] || chat.avatar;
     el.innerHTML = `
-      <div class="b-ava">${kava(ava, b.sender.slice(-2))}<span class="mini">TALK</span></div>
+      <div class="b-ava">${kava(ava, b.sender.slice(-2), '', KAKAO.avatars[b.sender] ? b.sender : chat.name)}<span class="mini">TALK</span></div>
       <div class="b-body">
         <div class="b-app">카카오톡 · ${esc(b.title)} <small>지금</small></div>
         <div class="b-title">${esc(b.sender)}</div>
@@ -537,7 +549,7 @@ window.addEventListener('error', (e) => {
         <div class="et-icons">
           ${[['🏫', '학교 홈'], ['📰', '학교뉴스'], ['💺', '열람실 현황'], ['📢', '학사공지'], ['✅', '전자출결']].map(([i, l]) => `<div data-toast="${l}"><i>${i}</i>${l}</div>`).join('')}
         </div>
-        <div class="et-ad"><small>광고</small>${esc(ET.ad)}</div>
+        ${ET.adImg ? `<div class="et-ad-img">${ph(ET.adImg, ET.ad)}<small>AD</small></div>` : `<div class="et-ad"><small>광고</small>${esc(ET.ad)}</div>`}
         <div class="et-card">
           <h3>자주 찾는 게시판 <small data-tab="etBoards">더 보기 ›</small></h3>
           ${ET.homeBoards.map((b) => `<div class="b"><b>${esc(b.name)}</b><span>${esc(b.preview)}</span></div>`).join('')}
@@ -652,7 +664,8 @@ window.addEventListener('error', (e) => {
       html: `<div class="scr et">
         <div class="et-sub"><button class="bk" data-back>‹</button><h2>스크랩한 글</h2></div>
         ${postRow(p, 'rainbow')}
-      </div>`
+      </div>`,
+      after() { mission('scrap'); }
     };
   };
   S.etPost = ({ id, b, i }) => {
@@ -997,7 +1010,7 @@ window.addEventListener('error', (e) => {
         storyTimer = setTimeout(() => storyStep(1), 5000);
         if (h.id === IG.heesu.id) {
           state.seenStories.add(i);
-          if (IG.heesu.stories.every((_, k) => state.seenStories.has(k))) mission('stories');
+
         }
       }
     };
@@ -1230,19 +1243,29 @@ window.addEventListener('error', (e) => {
 
   /* ---------- 스포티파이 ---------- */
   S.spotify = () => {
-    const n = CONFIG.nowPlaying;
+    const pl = CONFIG.playlist || { name: '재생 목록', owner: '', length: '', songs: [CONFIG.nowPlaying.title], playing: 0 };
+    const now = pl.songs[pl.playing];
+    const eq = '<span class="sp-eq"><i></i><i></i><i></i></span>';
     return {
       status: 'normal', ui: 'light',
-      html: `<div class="scr sp">
-        <div class="top"><span>⌄</span><span>지금 재생 중</span><span>⋯</span></div>
-        ${ph(n.art, '앨범 아트', 'art dark')}
-        <h2>${esc(n.title)}</h2><p>${esc(n.artist)}</p>
-        <div class="prog"><i style="width:${n.progress * 100}%"></i></div>
-        <div class="tm"><span>${n.elapsed}</span><span>${n.duration}</span></div>
-        <div class="ctl"><span>⤨</span><span>⏮</span><span class="pp">❚❚</span><span>⏭</span><span>⟲</span></div>
+      html: `<div class="scr spl">
+        <div class="spl-top"><button class="circ" data-back>${svgI('<path d="M19 12H5M11 5l-7 7 7 7"/>')}</button><button class="circ">${svgI('<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>', 2.6)}</button></div>
+        <div class="spl-cover"><span>${svgI('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', 1.6)}</span></div>
+        <h1>${esc(pl.name)}</h1>
+        <div class="spl-owner"><span class="plus">＋</span>${ph(pl.ownerAvatar, '', 'round')}<b>${esc(pl.owner)}</b></div>
+        <div class="spl-meta">${svgI('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', 2)}${esc(pl.length)}</div>
+        <div class="spl-act">
+          <span class="sh">${svgI('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>', 2)}</span>
+          <span class="shuf">${svgI('<path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>', 2)}</span>
+          <span class="play"><i></i><i></i></span>
+        </div>
+        <div class="spl-chips"><span>＋ 추가</span><span>⫶ 믹스</span><span>▷ 동영상</span><span>≡ 수정</span><span>✎ 이름</span></div>
+        <div class="spl-list">${pl.songs.map((t, i) => `<div class="spl-song ${i === pl.playing ? 'on' : ''}"><span class="t">${i === pl.playing ? eq : ''}${esc(t)}</span><span class="m">⋮</span></div>`).join('')}</div>
+        <div class="spl-mini"><div class="mt"><b>${esc(now)}</b><span class="bar"><i></i></span></div><span class="dev">${svgI('<rect x="4" y="3" width="10" height="18" rx="2"/><circle cx="9" cy="15" r="2.5"/><path d="M18 6v12"/>', 1.8)}</span><span class="ok">✓</span><span class="pz"><i></i><i></i></span></div>
       </div>`
     };
   };
+  const svgI = (d, w = 2.2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 
   /* ---------- 유튜브 ---------- */
   S.youtube = () => ({
@@ -1351,6 +1374,7 @@ window.addEventListener('error', (e) => {
     }
   }
   function openApp(id) {
+    if (id === 'spotify' || id === 'calendar') mission(id);
     const map = { kakao: 'kakao' };
     const name = map[id] || id;
     if (!S[name]) { toast('준비 중'); return; }
