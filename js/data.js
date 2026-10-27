@@ -64,12 +64,12 @@ const BANNER_TIMING = { firstDelay: 3000, gap: 1900, afterTyping: 1200 };
 // 링크를 열면 DM 입력창에 글자가 한 글자씩 써져요 (startDelay: 시작 전 대기, speed: 한 글자당 ms)
 const DM_TYPING = { startDelay: 900, speed: 230 };
 const BANNERS = [
-  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '은석이형 아직도 체육관이에요??' },
-  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
-  { chat: 'rise', title: '라이즈🏀', sender: '경제 타로형', text: '은석 아직도 체육관이라고? 먼일이래' },
-  { chat: 'rise', title: '라이즈🏀', sender: '미디 이소희', text: '멀라요 문잠그는것만 까먹지 마요' },
+  { chat: 'rise', title: '🏀🏀', sender: '미디 이소희', text: '은석이형 아직도 체육관이에요??' },
+  { chat: 'rise', title: '🏀🏀', sender: '미디 이소희', text: '체육관 꼭 잠그고 가요 제발' },
+  { chat: 'rise', title: '🏀🏀', sender: '경제 타로형', text: '은석 아직도 체육관이라고? 먼일이래' },
+  { chat: 'rise', title: '🏀🏀', sender: '미디 이소희', text: '멀라요 문잠그는것만 까먹지 마요' },
   // delay: 바로 앞 배너와의 간격(ms). 없으면 BANNER_TIMING.gap
-  { chat: 'rise', title: '라이즈🏀', sender: '은석이', text: '죽는다 이소희', delay: 5000 }
+  { chat: 'rise', title: '🏀🏀', sender: '은석이', text: '죽는다 이소희', delay: 5000 }
 ];
 
 /* ---------------- 카카오톡 ---------------- */
@@ -97,7 +97,7 @@ const KAKAO = {
   },
   chats: [
     {
-      id: 'rise', name: '라이즈🏀', group: true, members: 14, avatar: 'images/kakao/rise.jpg', unread: 0, // 배너가 오면서 늘어나요
+      id: 'rise', name: '🏀🏀', group: true, members: 14, avatar: 'images/kakao/rise.jpg', unread: 0, // 배너가 오면서 늘어나요
       messages: [
         { date: '2026-04-04' },
         { from: '경제 타로형', type: 'photo', src: 'images/kakao/rise-0404-run.jpg', label: '은석이 어딘가로 달려가는 사진', t: '오후 11:02' },
