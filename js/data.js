@@ -428,7 +428,7 @@ const INSTAGRAM = {
     // 11화: 성찬이 밤새 들락거린 스토리 두 개
     stories: [
       { img: 'images/instagram/story-1-aburasoba.jpg', label: '아부라소바 사진 (양파 종지가 걸린 컷)', caption: '은석이 형이 사준 아부라소바', ago: '7시간' },
-      { img: 'images/instagram/story-2-cocktail.jpg', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
+      { img: 'images/instagram/story-2-cocktail.png', label: '칵테일바 셀카 (옆자리에 잘린 잔)', caption: '', ago: '6분' }
     ]
   },
   // 김희수 DM: 보내지 못한 채 입력창에 남은 문장
