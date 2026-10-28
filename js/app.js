@@ -1237,17 +1237,58 @@ window.addEventListener('error', (e) => {
       <div class="pad-bottom"></div>
     </div>`
   });
-  S.albumView = ({ i }) => {
-    const p = ALBUM.recent[i];
+  // 사진 보기: 옆으로 밀어서 다음/이전 사진 (실제 핸드폰처럼). 컴퓨터에선 양옆을 누르거나 ← → 키
+  const albumInfo = (p) => `<b>${p.date ? esc(dateLabel(p.date).replace(/^\d+년 /, '')) : ''}</b><small>${p.place ? `📍${esc(p.place)}` : ''}</small>`;
+  let albumKey = null;
+  S.albumView = ({ i = 0 }) => {
+    const list = ALBUM.recent;
     return {
       status: 'normal', ui: 'light',
       html: `<div class="scr viewer zoom-in">
         <div class="v-top"><button class="x" data-back>‹</button>
-          <div class="v-info"><b>${p.date ? esc(dateLabel(p.date).replace(/^\d+년 /, '')) : ''}</b><small>${p.place ? `📍${esc(p.place)}` : ''}</small></div>
-          <span style="width:30px"></span></div>
-        ${ph(p.src, p.label, 'dark')}
+          <div class="v-info" id="vInfo">${albumInfo(list[i])}</div>
+          <span class="v-count" id="vCount">${i + 1} / ${list.length}</span></div>
+        <div class="v-track" id="vTrack">${list.map((p) => `<div class="v-slide">${ph(p.src, p.label, 'dark')}</div>`).join('')}</div>
+        <button class="v-nav prev" aria-label="이전 사진"></button><button class="v-nav next" aria-label="다음 사진"></button>
+        <div class="v-thumbs" id="vThumbs">${list.map((p, k) => `<span data-k="${k}" class="${k === i ? 'on' : ''}">${ph(p.src, '', '')}</span>`).join('')}</div>
         <div class="v-bottom"><span>⇪</span><span>♡</span><span>ⓘ</span><span>🗑</span></div>
-      </div>`
+      </div>`,
+      after(el) {
+        const track = el.querySelector('#vTrack');
+        const thumbs = el.querySelector('#vThumbs');
+        let cur = i;
+        const go = (k, smooth = true) => {
+          k = Math.max(0, Math.min(list.length - 1, k));
+          track.scrollTo({ left: k * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+        };
+        const sync = () => {
+          const k = Math.round(track.scrollLeft / track.clientWidth);
+          if (k === cur || k < 0 || k >= list.length) return;
+          cur = k;
+          const st = currentScreen(); if (st && st.name === 'albumView') st.params.i = k;
+          el.querySelector('#vInfo').innerHTML = albumInfo(list[k]);
+          el.querySelector('#vCount').textContent = `${k + 1} / ${list.length}`;
+          thumbs.querySelectorAll('span').forEach((t, n) => t.classList.toggle('on', n === k));
+          const on = thumbs.children[k];
+          if (on) thumbs.scrollTo({ left: on.offsetLeft - thumbs.clientWidth / 2 + on.offsetWidth / 2, behavior: 'smooth' });
+        };
+        requestAnimationFrame(() => {
+          go(i, false);
+          const on = thumbs.children[i];
+          if (on) thumbs.scrollLeft = on.offsetLeft - thumbs.clientWidth / 2 + on.offsetWidth / 2;
+        });
+        track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+        el.querySelector('.v-nav.prev').addEventListener('click', (e) => { e.stopPropagation(); go(cur - 1); });
+        el.querySelector('.v-nav.next').addEventListener('click', (e) => { e.stopPropagation(); go(cur + 1); });
+        thumbs.addEventListener('click', (e) => { const t = e.target.closest('[data-k]'); if (t) { e.stopPropagation(); go(+t.dataset.k); } });
+        if (albumKey) document.removeEventListener('keydown', albumKey);
+        albumKey = (e) => {
+          if (!track.isConnected) { document.removeEventListener('keydown', albumKey); albumKey = null; return; }
+          if (e.key === 'ArrowLeft') go(cur - 1);
+          if (e.key === 'ArrowRight') go(cur + 1);
+        };
+        document.addEventListener('keydown', albumKey);
+      }
     };
   };
 
