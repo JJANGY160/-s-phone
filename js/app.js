@@ -1056,8 +1056,8 @@ window.addEventListener('error', (e) => {
         storyTimer = setTimeout(() => storyStep(1), 5000);
         if (h.id === IG.heesu.id) {
           state.seenStories.add(i);
-          // 할 일: 희수 스토리를 마지막(칵테일바)까지 보면 완료
-          if (i === h.stories.length - 1) mission('heesuStory');
+          // 할 일: 희수 스토리 화면에 들어가기만 해도 완료 (몇 번째 장이든)
+          mission('heesuStory');
         }
       }
     };
