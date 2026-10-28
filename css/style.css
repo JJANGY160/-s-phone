@@ -995,3 +995,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ph.ld::after { visibility: hidden; }
 .ig-mefeed .mf-head { position: sticky; top: 0; z-index: 5; background: #fff; }
 .ig-mefeed .ig-post { margin-bottom: 10px; }
+
+/* ---------- 11차: 사진 옆으로 넘기기 ---------- */
+.viewer .v-count { width: 44px; text-align: right; font-size: 12px; color: #c7c7cc; }
+.viewer .v-track { position: absolute; top: 96px; bottom: 150px; left: 0; right: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.viewer .v-track::-webkit-scrollbar { display: none; }
+.viewer .v-slide { flex: 0 0 100%; height: 100%; scroll-snap-align: center; scroll-snap-stop: always; position: relative; }
+.viewer .v-slide .ph { position: absolute; inset: 0; background: #000; }
+.viewer .v-slide .ph.ld { background: #000; }
+.viewer .v-slide .ph img, .viewer .v-slide .ph video { object-fit: contain; }
+.viewer .v-nav { position: absolute; top: 96px; bottom: 150px; width: 16%; z-index: 4; background: none; border: 0; cursor: pointer; }
+.viewer .v-nav.prev { left: 0; } .viewer .v-nav.next { right: 0; }
+@media (hover: none) { .viewer .v-nav { display: none; } }
+.viewer .v-thumbs { position: absolute; left: 0; right: 0; bottom: 84px; height: 46px; display: flex; gap: 2px; overflow-x: auto; padding: 0 50%; scrollbar-width: none; z-index: 5; }
+.viewer .v-thumbs::-webkit-scrollbar { display: none; }
+.viewer .v-thumbs span { flex: 0 0 30px; height: 46px; opacity: .55; cursor: pointer; transition: flex-basis .2s, opacity .2s; }
+.viewer .v-thumbs span.on { flex-basis: 46px; opacity: 1; margin: 0 4px; }
+.viewer .v-thumbs .ph { position: relative; inset: auto; width: 100%; height: 100%; }
+.viewer .v-thumbs .ph::after { content: none; }
+.viewer .v-nav:focus, .viewer .v-nav:focus-visible { outline: none; }
