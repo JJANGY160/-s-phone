@@ -249,7 +249,7 @@ window.addEventListener('error', (e) => {
     const W = MAPW;
     const at = W.places[seongchanSpot()];
     const gym = W.places.gym;
-    const withE = state.done.size >= 3;
+    const withE = eunseokShown();
     return `<div class="map-widget" data-open="map">
       <div class="mw-map">
         <svg class="mw-roads" viewBox="0 0 320 150" preserveAspectRatio="none">
@@ -280,6 +280,7 @@ window.addEventListener('error', (e) => {
     </div>`;
   }
   // 은석 핀: 체육관에서 '띡' 나타났다가(히든 설정: 성찬이 은석 폰을 뺏어 위치 공유 등록), 마지막엔 집으로
+  function eunseokShown() { return state.done.has('aiask') && state.done.size >= 3; }
   function eunseokStyle() {
     const p = MAPW.places[state.backHome ? 'home' : 'gym'];
     return `left:${p.x + 12}%;top:${p.y}%`;
@@ -289,13 +290,14 @@ window.addEventListener('error', (e) => {
     const sc = document.getElementById('mwSeongchan');
     if (sc) { const at = W.places[seongchanSpot()]; sc.style.left = at.x + '%'; sc.style.top = at.y + '%'; }
     const es = document.getElementById('mwEunseok');
-    if (es) { es.classList.toggle('show', state.done.size >= 3); es.setAttribute('style', eunseokStyle()); }
+    // aiAsk에서 위치 공유 방법을 알아낸 뒤, 성찬이 체육관에 도착하면(할 일 3개) 은석이 지도에 떠요
+    if (es) { es.classList.toggle('show', eunseokShown()); es.setAttribute('style', eunseokStyle()); }
   }
 
   /* ---------- 할 일 (미션) ---------- */
   // stories: 희수 스토리 2개 / rise: 라이즈 단톡방 / eunseok: 은석 카톡방 / comment: 얼라이브 게시글 댓글
   // comment: 얼라이브 게시글 댓글 / scrap: 에타 '스크랩한 글' 화면 / spotify: 스포티파이 열기 / calendar: 캘린더 열기
-  const MISSIONS = ['comment', 'scrap', 'spotify', 'calendar'];
+  const MISSIONS = ['comment', 'aiask', 'spotify', 'calendar'];
   function mission(key) {
     if (!key || !MISSIONS.includes(key) || state.done.has(key)) return;
     state.done.add(key);
@@ -654,7 +656,7 @@ window.addEventListener('error', (e) => {
   function postRow(p, board, i) {
     const target = p.id ? `data-go="etPost" data-p="${P({ id: p.id })}"` : `data-go="etPost" data-p="${P({ b: board, i })}"`;
     return `<div class="et-post-row" ${target}>
-      <h4>${esc(p.title)}</h4><p>${esc(p.body.split('\n')[0])}</p>
+      <h4>${esc(p.title)}</h4>${p.adult ? '' : `<p>${esc(p.body.split('\n')[0])}</p>`}
       <div class="mt"><span>${esc(p.time)}</span><span>익명</span><span class="lk">♡ ${p.likes}</span><span class="cm">💬 ${p.comments}</span>${p.scrapped ? `<span class="sc">★ ${p.scraps}</span>` : ''}</div>
     </div>`;
   }
@@ -677,7 +679,6 @@ window.addEventListener('error', (e) => {
         <div class="et-sub"><button class="bk" data-back>‹</button><h2>스크랩한 글</h2></div>
         ${postRow(p, 'rainbow')}
       </div>`,
-      after() { mission('scrap'); }
     };
   };
   S.etPost = ({ id, b, i }) => {
@@ -724,7 +725,7 @@ window.addEventListener('error', (e) => {
     html: `<div class="scr et">
       <div class="et-sub"><button class="bk" data-back>‹</button><h2>알림</h2></div>
       ${ET.notifications.map((n, i) => `<div class="et-noti ${n.unread ? 'un' : ''}" ${i < 2 ? `data-go="etPost" data-p="${P({ id: 'hetero' })}"` : ''}>
-        <i>${i < 2 ? '💬' : '📢'}</i><div><b>${esc(n.board)}</b><p>${esc(n.text)}</p><small>${esc(n.time)}</small></div></div>`).join('')}
+        <i>${i < 2 ? '💬' : '📢'}</i><div><b>${esc(n.board)}</b><p>${esc(n.adult ? n.text.split(':')[0] : n.text)}</p><small>${esc(n.time)}</small></div></div>`).join('')}
     </div>`
   });
   S.etMessages = () => ({
@@ -1391,10 +1392,60 @@ window.addEventListener('error', (e) => {
         if (m.type === 'photo') return `<div class="ai-photo">${ph(m.src, m.label)}</div>`;
         return `<div class="${m.role === 'user' ? 'ai-q' : 'ai-a'}">${esc(m.text)}</div>`;
       }).join('')}</div>
-      <div class="ai-input"><div>aiAsk에게 물어보기</div></div>
+      <div class="ai-input"><div id="aiBox" class="${state.aiDone || state.aiRunning ? 'used' : 'tap'}" data-act="aiAsk">${state.aiDone ? 'aiAsk에게 물어보기' : '<span class="ai-ph">aiAsk에게 물어보기</span>'}</div></div>
     </div>`,
     after(el) { el.scrollTop = el.scrollHeight; }
   });
+  // 6/3 새벽, 독자가 입력창을 누르면 성찬의 질문이 써지고 대화가 이어져요 (data.js의 AIASK_LIVE)
+  const AIL = typeof AIASK_LIVE !== 'undefined' ? AIASK_LIVE : null;
+  const aiMsgs = () => document.querySelector('.scr.ai .ai-msgs');
+  const aiScroll = () => { const sc = document.querySelector('.scr.ai'); if (sc) sc.scrollTop = sc.scrollHeight; };
+  function aiAppend(html) { const m = aiMsgs(); if (m) { m.insertAdjacentHTML('beforeend', html); aiScroll(); } }
+  function runAiAsk() {
+    if (!AIL || state.aiRunning || state.aiDone) return;
+    state.aiRunning = true;
+    AIASK.push({ date: AIL.date });
+    aiAppend(`<div class="ai-date">${esc(AIL.date)}</div>`);
+    const steps = AIL.messages.slice();
+    const box = () => document.getElementById('aiBox');
+    const next = () => {
+      const cur = currentScreen();
+      const onAi = cur && cur.name === 'aiask';
+      const m = steps.shift();
+      if (!m) {
+        state.aiRunning = false; state.aiDone = true;
+        const b = box(); if (b) { b.className = 'used'; b.textContent = 'aiAsk에게 물어보기'; }
+        mission('aiask');
+        return;
+      }
+      if (m.role === 'user') {
+        // 입력창에 한 글자씩 → 전송
+        const chars = [...m.text]; let k = 0;
+        const type = () => {
+          k += 1;
+          const b = box(); if (b) { b.className = 'typing'; b.textContent = chars.slice(0, k).join(''); }
+          if (k < chars.length) setTimeout(type, (AIL.speed || 120) + Math.random() * 60 - 20);
+          else setTimeout(() => {
+            AIASK.push({ role: 'user', text: m.text });
+            const b2 = box(); if (b2) { b2.className = 'used'; b2.textContent = ''; }
+            aiAppend(`<div class="ai-q">${esc(m.text)}</div>`);
+            setTimeout(next, m.pause ?? 600);
+          }, 350);
+        };
+        if (!onAi) { AIASK.push({ role: 'user', text: m.text }); setTimeout(next, 200); return; }
+        type();
+      } else {
+        aiAppend('<div class="ai-a ai-wait"><i></i><i></i><i></i></div>');
+        setTimeout(() => {
+          const w = document.querySelector('.ai-wait'); if (w) w.remove();
+          AIASK.push({ role: 'ai', text: m.text });
+          aiAppend(`<div class="ai-a">${esc(m.text)}</div>`);
+          setTimeout(next, m.pause ?? 900);
+        }, AIL.thinking || 1300);
+      }
+    };
+    next();
+  }
 
   /* ---------- 크롬 ---------- */
   S.chrome = () => ({
@@ -1447,8 +1498,16 @@ window.addEventListener('error', (e) => {
     el.querySelectorAll('video').forEach((v) => { v.muted = true; const pr = v.play(); if (pr) pr.catch(() => {}); });
   }
   function go(name, params = {}) {
+    if (needsAdult(name, params) && !isAdult()) { ageGate(() => go(name, params)); return; }
     state.stack.push({ name, params });
     render(true);
+  }
+  // 성인 확인이 필요한 화면: 에타 '그 글'(ET.posts에서 adult:true)
+  function needsAdult(name, params) {
+    if (name !== 'etPost') return false;
+    if (params.id) return !!(ET.posts[params.id] && ET.posts[params.id].adult);
+    const bp = ET.boards[params.b] && ET.boards[params.b].posts[params.i];
+    return !!(bp && bp.adult);
   }
   function replace(name, params = {}) {
     state.stack[state.stack.length - 1] = { name, params };
@@ -1532,6 +1591,7 @@ window.addEventListener('error', (e) => {
         el.querySelector('em').textContent = fmt(num(f.likes) + (meLiked[k] ? 1 : 0));
         break;
       }
+      case 'aiAsk': runAiAsk(); break;
       case 'blurPlay': toast('이 영상은 성찬만 볼 수 있어요'); break;
     }
   }
@@ -1553,14 +1613,62 @@ window.addEventListener('error', (e) => {
 
   /* ---------- 시작 ---------- */
   // 링크를 열면: 김희수 인스타 DM 창 (11화, DM을 보내려다 멈춘 순간)
-  // 뒤로 가기: DM → 희수 프로필 → 인스타 검색 → 홈
+  // 뒤로 가기: DM → 인스타 검색 → 홈
   // 주소 끝에 #home 을 붙이면 홈 화면에서 시작해요 (작업 확인용)
   state.unlocked = true;
-  if (location.hash === '#home') state.stack = [{ name: 'home', params: {} }];
-  else if (location.hash === '#lock') { state.unlocked = false; state.stack = [{ name: 'lock', params: {} }]; }
-  else state.stack = [{ name: 'home', params: {} }, { name: 'igSearch', params: {} }, { name: 'igDm', params: {} }];
-  render(false);
-  // 희수 DM에서 시작하면 타이핑이 끝난 뒤 배너가 시작돼요 (startTyping). 그 외에는 바로 시작.
-  if (currentScreen().name !== 'igDm' && state.unlocked) { state.typed = true; startBanners(); }
-  if (!state.unlocked) state.typed = true;
+  function boot() {
+    if (location.hash === '#home') state.stack = [{ name: 'home', params: {} }];
+    else if (location.hash === '#lock') { state.unlocked = false; state.stack = [{ name: 'lock', params: {} }]; }
+    else state.stack = [{ name: 'home', params: {} }, { name: 'igSearch', params: {} }, { name: 'igDm', params: {} }];
+    render(false);
+    // 희수 DM에서 시작하면 타이핑이 끝난 뒤 배너가 시작돼요 (startTyping). 그 외에는 바로 시작.
+    if (currentScreen().name !== 'igDm' && state.unlocked) { state.typed = true; startBanners(); }
+    if (!state.unlocked) state.typed = true;
+  }
+
+  /* ---------- 성인 확인 (에타 '그 글'을 열 때만) ---------- */
+  // 같은 브라우저에서 한 번 확인하면 다음부터는 바로 열려요
+  const AGE_KEY = 'scphone_adult_v1';
+  function isAdult() { try { return localStorage.getItem(AGE_KEY) === 'y'; } catch (e) { return false; } }
+  function ageGate(onPass) {
+    if (phoneEl.querySelector('.age-gate')) return;
+    const g = document.createElement('div');
+    g.className = 'age-gate';
+    const close = () => { g.classList.add('out'); setTimeout(() => g.remove(), 300); };
+    g.innerHTML = `
+      <div class="ag-card">
+        <div class="ag-19">19</div>
+        <h2>성인 확인</h2>
+        <p>이 게시글은 <b>만 19세 이상</b>만 볼 수 있어요.</p>
+        <label class="ag-in"><input id="agYear" type="text" inputmode="numeric" maxlength="4" placeholder="출생연도 4자리 (예: 2001)" autocomplete="off"></label>
+        <div class="ag-msg" id="agMsg"></div>
+        <button class="ag-ok" id="agOk">확인</button>
+        <button class="ag-no" id="agNo">돌아가기</button>
+      </div>`;
+    phoneEl.appendChild(g);
+    const inp = g.querySelector('#agYear');
+    const msg = g.querySelector('#agMsg');
+    const block = () => {
+      g.querySelector('.ag-card').innerHTML = `<div class="ag-19">19</div><h2>볼 수 없는 게시글이에요</h2><p>이 게시글은 만 19세 이상만 볼 수 있어요.</p><button class="ag-no" id="agBack">돌아가기</button>`;
+      g.querySelector('#agBack').addEventListener('click', close);
+    };
+    const ok = () => {
+      const v = inp.value.trim();
+      const y = Number(v);
+      const now = new Date().getFullYear();
+      if (!/^\d{4}$/.test(v) || y < now - 100 || y > now) { msg.textContent = '출생연도 4자리를 정확히 입력해 주세요'; inp.focus(); return; }
+      // 청소년보호법 기준: 19세가 되는 해의 1월 1일부터 이용 가능
+      if (now - y < 19) { block(); return; }
+      try { localStorage.setItem(AGE_KEY, 'y'); } catch (e) {}
+      close();
+      if (onPass) onPass();
+    };
+    inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); msg.textContent = ''; });
+    inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') ok(); });
+    g.querySelector('#agOk').addEventListener('click', ok);
+    g.querySelector('#agNo').addEventListener('click', close);
+    g.addEventListener('click', (e) => e.stopPropagation());
+    setTimeout(() => inp.focus(), 50);
+  }
+  boot();
 })();
