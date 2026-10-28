@@ -455,8 +455,8 @@ const INSTAGRAM = {
 const PETCAM = {
   cams: [
     { id: 'living', name: '거실', live: 'images/petcam/live-living.png', liveLabel: '빈 거실, 소파 위 터그 장난감' },
-    // 5/22 아침 이후로 침실 캠은 꺼 둠
-    { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '', off: true, offSince: '5월 22일 오전 8:31' }
+    // 5/21 아침 이후로 침실 캠은 꺼 둠
+    { id: 'bedroom', name: '침실', live: 'images/petcam/live-bedroom.jpg', liveLabel: '', off: true, offSince: '5월 21일 오전 8:31' }
   ],
   // blur:true → 사진 없이 흐린 화면으로 표시, 재생 안 됨 (img 필요 없음)
   // .gif/.mp4 파일을 넣으면 움짤·영상으로 재생돼요
@@ -467,11 +467,11 @@ const PETCAM = {
     { date: '2026-05-25', items: [
       { cam: 'living', time: '21:46', tag: '사람 감지', blur: true }
     ]},
-    { date: '2026-05-22', items: [
-      { cam: 'bedroom', time: '08:31', tag: '카메라 꺼짐', img: '', label: '', system: true },
-      { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.mp4', label: '아침 상황 (움짤)', star: true }
-    ]},
+    // 5/20 밤 은석이 단복 차림으로 와서 잠 → 5/21 아침 둘이 캠을 보며 상의하고 침실 캠을 끔
+    // (파일 이름은 0522 그대로)
     { date: '2026-05-21', items: [
+      { cam: 'bedroom', time: '08:31', tag: '카메라 꺼짐', img: '', label: '', system: true },
+      { cam: 'bedroom', time: '08:14', tag: '움직임 감지', img: 'images/petcam/clip-0522-0814.mp4', label: '캠을 보며 상의하는 두 사람 (끄기 직전)', star: true },
       { cam: 'bedroom', time: '03:12', tag: '사람 감지', blur: true }
     ]},
     // 축제 끝난 밤(5/14) ~ 다음 날 아침(5/15)
