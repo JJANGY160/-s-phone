@@ -237,12 +237,14 @@ window.addEventListener('error', (e) => {
   }
 
   /* ---------- 홈 화면 지도 위젯 ---------- */
-  // 성찬 위치: 할 일을 할 때마다 집 → 체육관으로 1/3씩 이동 (3개째에 체육관 도착), 4개 완료면 둘이 같이 집으로
+  // 성찬 위치: 0개 집 → 1개 집과 체육관 중간 → 2개 이상 체육관 → 4개 완료면 둘이 같이 집으로
   function seongchanAt() {
     const P = MAPW.places;
     if (state.backHome) return P.home;
-    const t = Math.min(state.done.size, 3) / 3;
-    return { x: +(P.home.x + (P.gym.x - P.home.x) * t).toFixed(1), y: +(P.home.y + (P.gym.y - P.home.y) * t).toFixed(1) };
+    const n = state.done.size;
+    if (n === 0) return P.home;
+    if (n === 1) return P.mid || { x: (P.home.x + P.gym.x) / 2, y: (P.home.y + P.gym.y) / 2 };
+    return P.gym;
   }
   function personPin(p, cls) {
     return `<div class="mw-pin ${cls}">${ph(p.avatar, p.name, 'round')}<span>${esc(p.name)}</span></div>`;
@@ -282,7 +284,7 @@ window.addEventListener('error', (e) => {
     </div>`;
   }
   // 은석 핀: 체육관에서 '띡' 나타났다가(히든 설정: 성찬이 은석 폰을 뺏어 위치 공유 등록), 마지막엔 집으로
-  function eunseokShown() { return state.done.has('aiask') && state.done.size >= 3; }
+  function eunseokShown() { return state.done.size >= 3; }   // 3개째에 은석이 체육관에 '띡'
   function eunseokStyle() {
     const p = MAPW.places[state.backHome ? 'home' : 'gym'];
     return `left:${p.x + 12}%;top:${p.y}%`;
@@ -292,8 +294,7 @@ window.addEventListener('error', (e) => {
     const sc = document.getElementById('mwSeongchan');
     if (sc) { const at = seongchanAt(); sc.style.left = at.x + '%'; sc.style.top = at.y + '%'; }
     const es = document.getElementById('mwEunseok');
-    // aiAsk에서 위치 공유 방법을 알아낸 뒤, 성찬이 체육관에 도착하면(할 일 3개) 은석이 지도에 떠요
-    // (aiAsk를 4번째로 하면 펫캠 알림과 함께 떠요)
+    // 할 일 3개째에 은석이 지도에 떠요
     if (es) { es.classList.toggle('show', eunseokShown()); es.setAttribute('style', eunseokStyle()); }
   }
 
