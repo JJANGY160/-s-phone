@@ -297,7 +297,7 @@ window.addEventListener('error', (e) => {
   /* ---------- 할 일 (미션) ---------- */
   // stories: 희수 스토리 2개 / rise: 라이즈 단톡방 / eunseok: 은석 카톡방 / comment: 얼라이브 게시글 댓글
   // comment: 얼라이브 게시글 댓글 / scrap: 에타 '스크랩한 글' 화면 / spotify: 스포티파이 열기 / calendar: 캘린더 열기
-  const MISSIONS = ['comment', 'aiask', 'spotify', 'calendar'];
+  const MISSIONS = ['comment', 'aiask', 'spotify', 'heesuStory'];
   function mission(key) {
     if (!key || !MISSIONS.includes(key) || state.done.has(key)) return;
     state.done.add(key);
@@ -1056,7 +1056,8 @@ window.addEventListener('error', (e) => {
         storyTimer = setTimeout(() => storyStep(1), 5000);
         if (h.id === IG.heesu.id) {
           state.seenStories.add(i);
-
+          // 할 일: 희수 스토리를 마지막(칵테일바)까지 보면 완료
+          if (i === h.stories.length - 1) mission('heesuStory');
         }
       }
     };
@@ -1528,7 +1529,7 @@ window.addEventListener('error', (e) => {
     }
   }
   function openApp(id) {
-    if (id === 'spotify' || id === 'calendar') mission(id);
+    if (id === 'spotify') mission(id);
     const map = { kakao: 'kakao' };
     const name = map[id] || id;
     if (!S[name]) { toast('준비 중'); return; }
